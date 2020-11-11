@@ -6,4 +6,13 @@ public class VarFloat extends Variable {
         this.name = name;
         this.valor = valor;
     }
+    public VarFloat(String name){
+        this.type = "float";
+        this.name = name;
+        this.valor = 0;
+    }
+
+
+
+
 }
