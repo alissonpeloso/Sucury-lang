@@ -3,10 +3,10 @@ import java.util.Scanner;
 
 public class Scan {
 
-    String lines[2000];
+    String lines[];
 
     public void printFile(){
-        for (int i = 0; i < sizeof(this.lines); i++) {
+        for (int i = 0; i < this.lines.length ; i++) {
             System.out.println("Linha " + i + ": " + this.lines[i]);
         }
     }
