@@ -1,7 +1,7 @@
 public class Sucury {
     public static void main(String[] args) {
-        if ( args.length != 1 ){
-            System.out.println("Rode: java Sucury nomeArquivo.sy");
+        if ( args.length !=1 ) {
+            System.out.println(​"Rode: java Sucury "nomeArquivo.sy"");
             return;
         }
 
@@ -9,7 +9,7 @@ public class Sucury {
         Scan Teste = new Scan();
         Teste.readFile(fileName);
         Teste.printFile();
-        
+
     }
 }
 
