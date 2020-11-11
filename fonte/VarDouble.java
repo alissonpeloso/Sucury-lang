@@ -6,4 +6,11 @@ public class VarDouble extends Variable{
         this.name = name;
         this.valor = valor;
     }
+    public VarDouble(String name){
+        this.type= "double";
+        this.name= name;
+        this.valor= 0;
+    }
+
+
 }

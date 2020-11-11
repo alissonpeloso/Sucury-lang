@@ -6,4 +6,13 @@ public class VarString extends Variable{
         this.name = name;
         this.valor = valor;
     }
+    public VarString(String name){
+        this.type = "string";
+        this.name = name;
+        this.valor = null;
+    }
+
+
+
+
 }

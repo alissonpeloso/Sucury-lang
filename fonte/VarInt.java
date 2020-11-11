@@ -6,4 +6,14 @@ public class VarInt extends Variable {
         this.name = name;
         this.valor = valor;
     }
+    public VarInt(String name){
+        this.type = "int";
+        this.name = name;
+        this.valor = 0;
+    }
+
+
+
+
+
 }
