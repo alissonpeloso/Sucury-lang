@@ -1,16 +1,19 @@
 public class VarDouble extends Variable{
-    public double valor;
+    public double value;
 
-    public VarDouble(String name, double valor){
+    public VarDouble(String name, double value){
         this.type = "double";
         this.name = name;
-        this.valor = valor;
+        this.value = value;
     }
     public VarDouble(String name){
         this.type= "double";
         this.name= name;
-        this.valor= 0;
+        this.value= 0;
     }
 
+    public Double getValue(){
+        return this.value;
+    }
 
 }

@@ -1,18 +1,19 @@
 public class VarFloat extends Variable {
-    public float valor;
+    public float value;
 
-    public VarFloat(String name, float valor){
+    public VarFloat(String name, float value){
         this.type = "float";
         this.name = name;
-        this.valor = valor;
+        this.value = value;
     }
     public VarFloat(String name){
         this.type = "float";
         this.name = name;
-        this.valor = 0;
+        this.value = 0;
     }
 
-
-
+    public Float getValue(){
+        return this.value;
+    }
 
 }
