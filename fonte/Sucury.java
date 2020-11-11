@@ -5,10 +5,11 @@ public class Sucury {
             return;
         }
 
-        String filename = args[0];
-        Scan Teste = new Scan(fileName);
-        Teste.printFile;
-        
+        String fileName = args[0];
+        Scan Teste = new Scan();
+        Teste.readFile(fileName);
+        Teste.printFile();
+
     }
 }
 

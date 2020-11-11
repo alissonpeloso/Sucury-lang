@@ -2,7 +2,6 @@ import java.io.File;
 import java.util.Scanner;
 
 public class Scan {
-
     String lines[];
 
     public void printFile(){
