@@ -1,4 +1,4 @@
 public class Variable {
-    private String type;
-    private String name;
+    public String type = new String();
+    public String name = new String();
 }
