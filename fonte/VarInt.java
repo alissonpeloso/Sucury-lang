@@ -1,18 +1,20 @@
 public class VarInt extends Variable {
-    public int valor;
+    public int value;
 
-    public VarInt(String name, int valor){
+    public VarInt(String name, int value){
         this.type = "int";
         this.name = name;
-        this.valor = valor;
+        this.value = value;
     }
     public VarInt(String name){
         this.type = "int";
         this.name = name;
-        this.valor = 0;
+        this.value = 0;
     }
 
-
+    public Integer getValue(){
+        return this.value;
+    }
 
 
 

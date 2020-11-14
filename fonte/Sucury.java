@@ -12,5 +12,3 @@ public class Sucury {
 
     }
 }
-
-//java Sucury.java "blah.sy"
