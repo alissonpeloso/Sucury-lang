@@ -8,6 +8,17 @@ public class Scan {
     public void printFile(){
         for (int i = 0; i < this.lines.length ; i++) {
             System.out.println("Linha " + i + ": " + this.lines[i]);
+            String[] a= this.lines[i].split(" ");//splita nos espacos
+            
+            //------Verifica se e int-----//
+            SetVarInt[] inteiros= new SetVarInt[10000];
+            if("int".equals(a[0])){
+                inteiros[i]=new SetVarInt(); //manda pra funcao de pegar o int(SetVarInt)
+                inteiros[i].setInt(a);
+                
+            } 
+            //---------------------------//
+        
         }
     }
 
