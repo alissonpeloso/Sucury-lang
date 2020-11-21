@@ -1,12 +1,12 @@
-public class SetVarInt extends VarInt{
-    
+public class SetVarFloat extends VarFloat{ 
     public String div="";
     public String var_name; 
     public String[] splitar; 
     public String[] separar;
-    public int num_convertido;
-    public int num_original;
-    public void setInt(String a[]){
+    public float num_convertido;
+    public float num_original;
+
+    public void setFloat(String a[]){
         if(a.length>=2){//verefica se tem sinal de =
             if(a[1].indexOf("=")>=0 || a[1].indexOf("=")<=0){ 
             
@@ -19,53 +19,60 @@ public class SetVarInt extends VarInt{
                 
                 if(splitar[1].indexOf("+")>=0){
                     separar=splitar[1].split("\\+");
-                    num_original=Integer.parseInt(separar[0]); 
+                    num_original=Float.parseFloat(separar[0]); 
                 }
                 else if(splitar[1].indexOf("-")>=0){
                     separar=splitar[1].split("\\-");
-                    num_original=Integer.parseInt(separar[0]); 
+                    num_original=Float.parseFloat(separar[0]); 
                 }
                 else if(splitar[1].indexOf("*")>=0){
                     separar=splitar[1].split("\\*");
-                    num_original=Integer.parseInt(separar[0]); 
+                    num_original=Float.parseFloat(separar[0]); 
                 }
                 else if(splitar[1].indexOf("/")>=0){
                     separar=splitar[1].split("\\/");
-                    num_original=Integer.parseInt(separar[0]); 
+                    num_original=Float.parseFloat(separar[0]); 
                 }
                 else{
                     separar=splitar[1].split("(?!^)");
-                    num_original=Integer.parseInt(splitar[1]); 
+                    num_original=Float.parseFloat(splitar[1]); 
                 }
                 
                 
                 
                 if(separar.length==2){
                     if(splitar[1].indexOf("+")>=0){
-                        num_convertido=Integer.parseInt(separar[1]);
+                        num_convertido=Float.parseFloat(separar[1]);
                         num_original+=num_convertido;
                     }
                     else if(splitar[1].indexOf("-")>=0){
-                        num_convertido=Integer.parseInt(separar[1]);
+                        num_convertido=Float.parseFloat(separar[1]);
                         num_original-=num_convertido;
                     }
                     else if(splitar[1].indexOf("*")>=0){
-                        num_convertido=Integer.parseInt(separar[1]);
+                        num_convertido=Float.parseFloat(separar[1]);
                         num_original*=num_convertido;
                     }
                     else if(splitar[1].indexOf("/")>=0){
-                        num_convertido=Integer.parseInt(separar[1]);
+                        num_convertido=Float.parseFloat(separar[1]);
                         num_original/=num_convertido;
                     }
                 }
+                VarFloat1(var_name, num_original);
                 
-                VarInt1(var_name, num_original);
             }
         }else{ //caso o usuario so tenha digitado o nome da variavel
             var_name=a[1];
-            System.out.println(var_name);
-            VarInt1(var_name);
+            VarFloat1(var_name);
+            
         }
     }
     
+
 }
+
+
+
+
+
+

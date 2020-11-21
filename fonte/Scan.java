@@ -15,10 +15,15 @@ public class Scan {
             if("int".equals(a[0])){
                 inteiros[i]=new SetVarInt(); //manda pra funcao de pegar o int(SetVarInt)
                 inteiros[i].setInt(a);
-                
+                System.out.println(inteiros[i].name+" = "+inteiros[i].value);
             } 
-            //---------------------------//
-        
+            //------Verifica se e float-----//
+            SetVarFloat[] pflutuante= new SetVarFloat[10000];
+            if("float".equals(a[0])){
+                pflutuante[i]=new SetVarFloat(); //manda pra funcao de pegar o float(SetVarFloat)
+                pflutuante[i].setFloat(a);
+                System.out.println(pflutuante[i].name+" = "+pflutuante[i].value);
+            } 
         }
     }
 
