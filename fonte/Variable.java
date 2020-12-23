@@ -3,5 +3,4 @@ public abstract class Variable {
     public String name;
 
     abstract Object getValue();
-
 }
