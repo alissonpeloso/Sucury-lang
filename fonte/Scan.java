@@ -18,7 +18,7 @@ public class Scan {
             Scanner input = new Scanner(file);
             while (input.hasNextLine()) {
                 String line = input.nextLine();
-                this.lines = Util.AppendArray(this.lines.length, this.lines, line);
+                this.lines = Util.appendArray(this.lines.length, this.lines, line);
             }
             input.close();
         } catch (Exception e) {
