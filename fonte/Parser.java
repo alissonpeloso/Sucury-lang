@@ -7,7 +7,7 @@ public class Parser {
 
     public static void main(String[] args) {
         String[] oi = new String[1];
-        oi[0] = "double a= 2+498494";
+        oi[0] = "int a= 20+5+8/8";
 
         Parser alo = new Parser();
         alo.parseLines(oi);

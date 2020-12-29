@@ -1,98 +1,168 @@
-public class Operation {  
+public class Operation {
+    public static String[] treatment(String content){
+        String[] aux = content.split("");
+        String[] newContent = new String[0];
+        String concat = "";
+
+        for(int i = 0; i < aux.length; i++){
+            if(aux[i].equals("+") || aux[i].equals("-") || aux[i].equals("*") || aux[i].equals("/") || aux[i].equals("%")){
+                newContent = Util.appendArray(newContent.length, newContent, concat);
+                newContent = Util.appendArray(newContent.length, newContent, aux[i]);
+                concat = "";
+            }else{
+                concat = concat.concat(aux[i]);
+            }
+        }
+        if(newContent[0].equals("")){
+            newContent = Util.removeArray(newContent.length, newContent, 0);
+            if(newContent[0].equals("+") || newContent[0].equals("-")){
+                newContent[1] = newContent[0].concat(newContent[1]);
+                newContent = Util.removeArray(newContent.length, newContent, 0);
+            }
+        }
+        newContent = Util.appendArray(newContent.length, newContent, concat);
+        return newContent;
+    }
+
     public static Object chooseOperation(String content, String type){
-        String[] values;
-        if(content.indexOf("+")>=0){
-            values=content.split("\\+");
-            return Operation.sum(values,type);
-        }
-        else if(content.indexOf("-")>=0){
-            values=content.split("\\-");
-            return Operation.sub(values,type);
-        }
-        else if(content.indexOf("*")>=0){
-            values=content.split("\\*");
-            return Operation.mult(values,type);
-        }
-        else if(content.indexOf("/")>=0){
-            values=content.split("\\/");
-            return Operation.div(values,type);
-        }
-        else{
-            if(type.equals("float")){
-                float result = Float.parseFloat(content);
-                return result;
+        String [] values = treatment(content);
+        Object result = new Object();
+
+        if(content.indexOf("+") != -1 || content.indexOf("-") != -1 || content.indexOf("*") != -1 || content.indexOf("/") != -1 || content.indexOf("%") != -1){
+            for(int i = 0; i < values.length; i++){
+                if(values[i].equals("*")){
+                    result = mult(values, type, i-1, i+1);
+                    values[i-1] = result.toString();
+                    values = Util.removeArray(values.length, values, i);
+                    values = Util.removeArray(values.length, values, i);
+                    i --;
+                }
             }
-            if(type.equals("int")){
-                int result = Integer.parseInt(content);
-                return result;
+            for(int i = 0; i < values.length; i++){
+                if(values[i].equals("/")){
+                    result = div(values, type, i-1, i+1);
+                    values[i-1] = result.toString();
+                    values = Util.removeArray(values.length, values, i);
+                    values = Util.removeArray(values.length, values, i);
+                    i --;
+                }
             }
-            if(type.equals("double")){
-                double result = Double.parseDouble(content);
-                return result;
+            for(int i = 0; i < values.length; i++){
+                if(values[i].equals("%")){
+                    result = mod(values, type, i-1, i+1);
+                    values[i-1] = result.toString();
+                    values = Util.removeArray(values.length, values, i);
+                    values = Util.removeArray(values.length, values, i);
+                    i --;
+                }
+            }
+            for(int i = 0; i < values.length; i++){
+                if(values[i].equals("+")){
+                    result = sum(values, type, i-1, i+1);
+                    values[i-1] = result.toString();
+                    values = Util.removeArray(values.length, values, i);
+                    values = Util.removeArray(values.length, values, i);
+                    i --;
+                }
+            }
+            for(int i = 0; i < values.length; i++){
+                if(values[i].equals("-")){
+                    result = sub(values, type, i-1, i+1);
+                    values[i-1] = result.toString();
+                    values = Util.removeArray(values.length, values, i);
+                    values = Util.removeArray(values.length, values, i);
+                    i --;
+                }
             }
         }
-        return 0;
+    
+        if(type.equals("float")){
+            result = Float.parseFloat(values[0]);
+        }
+        if(type.equals("int")){
+            result = Integer.parseInt(values[0]);
+        }
+        if(type.equals("double")){
+            result = Double.parseDouble(values[0]);
+        }
+        return result;
     }
 
-    public static Object sum(String[] values, String type){
+    public static Object sum(String[] values, String type, int pos1, int pos2){
         if(type.equals("float")){
-            float result = Float.parseFloat(values[0]) + Float.parseFloat(values[1]);
+            float result = Float.parseFloat(values[pos1]) + Float.parseFloat(values[pos2]);
             return result;
         }
         if(type.equals("int")){
-            int result = Integer.parseInt(values[0]) + Integer.parseInt(values[1]);
+            int result = Integer.parseInt(values[pos1]) + Integer.parseInt(values[pos2]);
             return result;
         }
         if(type.equals("double")){
-            double result = Double.parseDouble(values[0]) + Double.parseDouble(values[1]);
-            return result;
-        }
-        return 0;
-    }
-
-    public static Object sub(String[] values, String type){
-        if(type.equals("float")){
-            float result = Float.parseFloat(values[0]) - Float.parseFloat(values[1]);
-            return result;
-        }
-        if(type.equals("int")){
-            int result = Integer.parseInt(values[0]) - Integer.parseInt(values[1]);
-            return result;
-        }
-        if(type.equals("double")){
-            double result = Double.parseDouble(values[0]) - Double.parseDouble(values[1]);
+            double result = Double.parseDouble(values[pos1]) + Double.parseDouble(values[pos2]);
             return result;
         }
         return 0;
     }
 
-    public static Object mult(String[] values, String type){
+    public static Object sub(String[] values, String type, int pos1, int pos2){
         if(type.equals("float")){
-            float result = Float.parseFloat(values[0]) * Float.parseFloat(values[1]);
+            float result = Float.parseFloat(values[pos1]) - Float.parseFloat(values[pos2]);
             return result;
         }
         if(type.equals("int")){
-            int result = Integer.parseInt(values[0]) * Integer.parseInt(values[1]);
+            int result = Integer.parseInt(values[pos1]) - Integer.parseInt(values[pos2]);
             return result;
         }
         if(type.equals("double")){
-            double result = Double.parseDouble(values[0]) * Double.parseDouble(values[1]);
+            double result = Double.parseDouble(values[pos1]) - Double.parseDouble(values[pos2]);
             return result;
         }
         return 0;
     }
 
-    public static Object div(String[] values, String type){
+    public static Object mult(String[] values, String type, int pos1, int pos2){
         if(type.equals("float")){
-            float result = Float.parseFloat(values[0]) / Float.parseFloat(values[1]);
+            float result = Float.parseFloat(values[pos1]) * Float.parseFloat(values[pos2]);
             return result;
         }
         if(type.equals("int")){
-            int result = Integer.parseInt(values[0]) / Integer.parseInt(values[1]);
+            int result = Integer.parseInt(values[pos1]) * Integer.parseInt(values[pos2]);
             return result;
         }
         if(type.equals("double")){
-            double result = Double.parseDouble(values[0]) / Double.parseDouble(values[1]);
+            double result = Double.parseDouble(values[pos1]) * Double.parseDouble(values[pos2]);
+            return result;
+        }
+        return 0;
+    }
+
+    public static Object div(String[] values, String type, int pos1, int pos2){
+        if(type.equals("float")){
+            float result = Float.parseFloat(values[pos1]) / Float.parseFloat(values[pos2]);
+            return result;
+        }
+        if(type.equals("int")){
+            int result = Integer.parseInt(values[pos1]) / Integer.parseInt(values[pos2]);
+            return result;
+        }
+        if(type.equals("double")){
+            double result = Double.parseDouble(values[pos1]) / Double.parseDouble(values[pos2]);
+            return result;
+        }
+        return 0;
+    }
+
+    public static Object mod(String[] values, String type, int pos1, int pos2){
+        if(type.equals("float")){
+            float result = Float.parseFloat(values[pos1]) % Float.parseFloat(values[pos2]);
+            return result;
+        }
+        if(type.equals("int")){
+            int result = Integer.parseInt(values[pos1]) % Integer.parseInt(values[pos2]);
+            return result;
+        }
+        if(type.equals("double")){
+            double result = Double.parseDouble(values[pos1]) % Double.parseDouble(values[pos2]);
             return result;
         }
         return 0;
