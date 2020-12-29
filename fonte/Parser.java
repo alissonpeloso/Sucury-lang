@@ -7,8 +7,7 @@ public class Parser {
 
     public static void main(String[] args) {
         String[] oi = new String[1];
-        oi[0] = "int a= 20+5+8/8";
-
+        oi[0] = "int a = (1+2)*2*(10/5)+(8-3)";
         Parser alo = new Parser();
         alo.parseLines(oi);
         System.out.println(alo.variables.get("a").getValue());

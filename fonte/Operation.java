@@ -5,28 +5,54 @@ public class Operation {
         String concat = "";
 
         for(int i = 0; i < aux.length; i++){
-            if(aux[i].equals("+") || aux[i].equals("-") || aux[i].equals("*") || aux[i].equals("/") || aux[i].equals("%")){
-                newContent = Util.appendArray(newContent.length, newContent, concat);
+            if(aux[i].equals("+") || aux[i].equals("-") || aux[i].equals("*") || aux[i].equals("/") || aux[i].equals("%") || aux[i].equals("(") || aux[i].equals(")")){
+                if(!concat.equals("")){
+                    newContent = Util.appendArray(newContent.length, newContent, concat);
+                    concat = "";
+                }
                 newContent = Util.appendArray(newContent.length, newContent, aux[i]);
-                concat = "";
             }else{
                 concat = concat.concat(aux[i]);
             }
         }
-        if(newContent[0].equals("")){
+        newContent = Util.appendArray(newContent.length, newContent, concat);
+        if(newContent[0].equals("+") || newContent[0].equals("-")){
+            newContent[1] = newContent[0].concat(newContent[1]);
             newContent = Util.removeArray(newContent.length, newContent, 0);
-            if(newContent[0].equals("+") || newContent[0].equals("-")){
-                newContent[1] = newContent[0].concat(newContent[1]);
-                newContent = Util.removeArray(newContent.length, newContent, 0);
+        }
+        for(int i = 0 ; i < newContent.length; i++){
+            if(newContent[i].equals("(")){
+                if(newContent[i+1].equals("+") || newContent[i+1].equals("-")){
+                    newContent[i+2] = newContent[i+1].concat(newContent[i+2]);
+                    newContent = Util.removeArray(newContent.length, newContent, i+1);
+                }
             }
         }
-        newContent = Util.appendArray(newContent.length, newContent, concat);
         return newContent;
     }
 
     public static Object chooseOperation(String content, String type){
         String [] values = treatment(content);
         Object result = new Object();
+
+        if(content.indexOf("(") != -1){
+            for(int i = 0; i < values.length; i++){
+                if(values[i].equals("(")){
+                    int j;
+                    String part = "";
+                    for(j = i+1; !values[j].equals(")"); j++){
+                        part = part.concat(values[j]);
+                    }
+                    Object parenthResult = chooseOperation(part, type);
+                    values[i] = parenthResult.toString();
+                    for(j = i+1; !values[j].equals(")"); j++){
+                        values = Util.removeArray(values.length, values, j);
+                        j--;
+                    }                 
+                    values = Util.removeArray(values.length, values, j);
+                }
+            }
+        }
 
         if(content.indexOf("+") != -1 || content.indexOf("-") != -1 || content.indexOf("*") != -1 || content.indexOf("/") != -1 || content.indexOf("%") != -1){
             for(int i = 0; i < values.length; i++){
@@ -35,7 +61,7 @@ public class Operation {
                     values[i-1] = result.toString();
                     values = Util.removeArray(values.length, values, i);
                     values = Util.removeArray(values.length, values, i);
-                    i --;
+                    i--;
                 }
             }
             for(int i = 0; i < values.length; i++){
@@ -44,7 +70,7 @@ public class Operation {
                     values[i-1] = result.toString();
                     values = Util.removeArray(values.length, values, i);
                     values = Util.removeArray(values.length, values, i);
-                    i --;
+                    i--;
                 }
             }
             for(int i = 0; i < values.length; i++){
@@ -53,7 +79,7 @@ public class Operation {
                     values[i-1] = result.toString();
                     values = Util.removeArray(values.length, values, i);
                     values = Util.removeArray(values.length, values, i);
-                    i --;
+                    i--;
                 }
             }
             for(int i = 0; i < values.length; i++){
@@ -62,7 +88,7 @@ public class Operation {
                     values[i-1] = result.toString();
                     values = Util.removeArray(values.length, values, i);
                     values = Util.removeArray(values.length, values, i);
-                    i --;
+                    i--;
                 }
             }
             for(int i = 0; i < values.length; i++){
@@ -71,7 +97,7 @@ public class Operation {
                     values[i-1] = result.toString();
                     values = Util.removeArray(values.length, values, i);
                     values = Util.removeArray(values.length, values, i);
-                    i --;
+                    i--;
                 }
             }
         }
