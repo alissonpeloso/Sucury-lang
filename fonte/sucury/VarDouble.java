@@ -1,4 +1,4 @@
-package sucury;
+package fonte.sucury;
 
 public class VarDouble extends Variable{
     public double value;

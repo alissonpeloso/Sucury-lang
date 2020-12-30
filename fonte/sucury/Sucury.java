@@ -1,4 +1,4 @@
-package sucury;
+package fonte.sucury;
 
 public class Sucury {
     public static void main(String[] args) {

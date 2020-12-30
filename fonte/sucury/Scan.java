@@ -1,4 +1,4 @@
-package sucury;
+package fonte.sucury;
 import java.io.File;
 import java.util.Scanner;
 

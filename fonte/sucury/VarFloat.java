@@ -1,4 +1,4 @@
-package sucury;
+package fonte.sucury;
 
 public class VarFloat extends Variable {
     public float value;

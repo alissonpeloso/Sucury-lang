@@ -1,4 +1,4 @@
-package sucury;
+package fonte.sucury;
 
 abstract class Variable {
     public String type;

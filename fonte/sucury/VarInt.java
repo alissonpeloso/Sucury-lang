@@ -1,4 +1,4 @@
-package sucury;
+package fonte.sucury;
 
 public class VarInt extends Variable {
     public int value;
