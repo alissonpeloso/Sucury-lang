@@ -1,3 +1,4 @@
+package sucury;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -6,8 +7,10 @@ public class Parser {
     protected Map<String, Variable> variables;
 
     public static void main(String[] args) {
-        String[] oi = new String[1];
-        oi[0] = "int a = (1+2)*2*(10/5)+(8-3)";
+        String[] oi = new String[2];
+        oi[0] = "double a = 20+5";
+        oi[1] = "a = 5+10";
+
         Parser alo = new Parser();
         alo.parseLines(oi);
         System.out.println(alo.variables.get("a").getValue());
@@ -26,9 +29,10 @@ public class Parser {
                 VarInt integer;
                 String concatLine = "";
                 int equalPosition = lines[i].indexOf("=");
-                String [] preEquals = Util.lineInWordArray(lines[i].substring(0, equalPosition));
-
+                String [] preEquals =Util.lineInWordArray(lines[i]);
+                
                 if(equalPosition != -1){ //Verifica se tem sinal de =
+                    preEquals = Util.lineInWordArray(lines[i].substring(0, equalPosition));
                     String[] posEquals = Util.lineInWordArray(lines[i].substring(equalPosition+1, lines[i].length()));
                     for(int j = 0 ; j < posEquals.length ; j++){  //coloca td expressao em uma unica string
                         concatLine = concatLine.concat(posEquals[j]);
@@ -43,13 +47,14 @@ public class Parser {
             } 
 
             //------Verifica se e float-----//
-            if(lines[i].indexOf("float") != -1){
+            else if(lines[i].indexOf("float") != -1){
                 VarFloat pfloat;
                 String concatLine = "";
                 int equalPosition = lines[i].indexOf("=");
-                String [] preEquals = Util.lineInWordArray(lines[i].substring(0, equalPosition));
+                String [] preEquals =Util.lineInWordArray(lines[i]);
 
                 if(equalPosition != -1){ //Verifica se tem sinal de =
+                    preEquals = Util.lineInWordArray(lines[i].substring(0, equalPosition));
                     String[] posEquals = Util.lineInWordArray(lines[i].substring(equalPosition+1, lines[i].length()));
                     for(int j = 0 ; j < posEquals.length ; j++){  //coloca td expressao em uma unica string
                         concatLine = concatLine.concat(posEquals[j]);
@@ -64,13 +69,14 @@ public class Parser {
             } 
 
             //------Verifica se e double-----//
-            if(lines[i].indexOf("double") != -1){
+            else if(lines[i].indexOf("double") != -1){
                 VarDouble pfloat;
                 String concatLine = "";
                 int equalPosition = lines[i].indexOf("=");
-                String [] preEquals = Util.lineInWordArray(lines[i].substring(0, equalPosition));
+                String [] preEquals =Util.lineInWordArray(lines[i]);
 
                 if(equalPosition != -1){ //Verifica se tem sinal de =
+                    preEquals = Util.lineInWordArray(lines[i].substring(0, equalPosition));
                     String[] posEquals = Util.lineInWordArray(lines[i].substring(equalPosition+1, lines[i].length()));
                     for(int j = 0 ; j < posEquals.length ; j++){  //coloca td expressao em uma unica string
                         concatLine = concatLine.concat(posEquals[j]);
@@ -82,6 +88,38 @@ public class Parser {
                     pfloat = new VarDouble(preEquals[1]);
                 }
                 variables.put(pfloat.name, pfloat);
+            }
+
+            else{
+                String concatLine = "";
+                int equalPosition = lines[i].indexOf("=");
+                String [] preEquals = Util.lineInWordArray(lines[i].substring(0, equalPosition));
+                Variable search = this.variables.get(preEquals[0]);
+
+                if(search == null){
+                    System.out.println("Variavel não encontrada!");
+                    return;
+                }
+                else{
+                    if(equalPosition != -1){ //Verifica se tem sinal de =
+                        String[] posEquals = Util.lineInWordArray(lines[i].substring(equalPosition+1, lines[i].length()));
+                        for(int j = 0 ; j < posEquals.length ; j++){  //coloca td expressao em uma unica string
+                            concatLine = concatLine.concat(posEquals[j]);
+                        }
+                        if(search.type.equals("int")){
+                            int value = (int) Operation.chooseOperation(concatLine, "int");
+                            search.setValue(value);
+                        }
+                        else if(search.type.equals("float")){
+                            float value = (float) Operation.chooseOperation(concatLine, "float");
+                            search.setValue(value);
+                        }
+                        else if(search.type.equals("double")){
+                            double value = (double) Operation.chooseOperation(concatLine, "double");
+                            search.setValue(value);
+                        }
+                    }
+                }
             }
         }
     }

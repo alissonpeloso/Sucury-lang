@@ -1,3 +1,5 @@
+package sucury;
+
 public class VarInt extends Variable {
     public int value;
 
@@ -12,7 +14,13 @@ public class VarInt extends Variable {
         this.value = 0;
     }
 
-    public Integer getValue(){
-        return this.value;
+    @Override
+    public Integer getValue() {
+        return value;
+    }
+
+    @Override
+    void setValue(Object value) {
+        this.value = (int) value;
     }
 }

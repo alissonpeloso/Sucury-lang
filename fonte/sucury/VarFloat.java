@@ -1,3 +1,5 @@
+package sucury;
+
 public class VarFloat extends Variable {
     public float value;
 
@@ -12,7 +14,13 @@ public class VarFloat extends Variable {
         this.value = 0;
     }
 
-    public Float getValue(){
-        return this.value;
+    @Override
+    public Float getValue() {
+        return value;
+    }
+
+    @Override
+    public void setValue(Object value) {
+        this.value = (float) value;
     }
 }

@@ -1,10 +1,3 @@
-Isso é um teste 1
-Isso é um teste 2
-Isso é um teste 3
-Isso é um teste 4
-Isso é um teste 5
-Isso é um teste 6
-Isso é um teste 7
-Isso é um teste 8
-Isso é um teste 9
-Isso é um teste 10
+int a = 5+2+3+4
+float b
+b = (5+6+2)*5.6+3

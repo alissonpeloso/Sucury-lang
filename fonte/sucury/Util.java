@@ -1,3 +1,4 @@
+package sucury;
 import java.util.*;
 
 public class Util {

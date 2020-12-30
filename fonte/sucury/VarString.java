@@ -1,3 +1,5 @@
+package sucury;
+
 public class VarString extends Variable{
     public String value;
 
@@ -12,9 +14,13 @@ public class VarString extends Variable{
         this.value = null;
     }
 
+    @Override
     public String getValue(){
         return this.value;
     }
 
-
+    @Override
+    public void setValue(Object value) {
+        this.value = (String) value;
+    }
 }

@@ -1,3 +1,5 @@
+package sucury;
+
 public class VarDouble extends Variable{
     public double value;
 
@@ -11,7 +13,14 @@ public class VarDouble extends Variable{
         this.name= name;
         this.value= 0;
     }
-    public Double getValue(){
-        return this.value;
+
+    @Override
+    public Double getValue() {
+        return value;
+    }
+
+    @Override
+    void setValue(Object value) {
+        this.value = (double) value;
     }
 }

@@ -1,3 +1,5 @@
+package sucury;
+
 public class Operation {
     public static String[] treatment(String content){
         String[] aux = content.split("");
