@@ -1,3 +1,7 @@
 int a = 5+2+3+4
-float b
+double b
 b = (5+6+2)*5.6+3
+double c = 1684984654*5468465
+print('Ola meundo!\n')
+print('meu numero favorito eh {}\n', c)
+print('else fodase {} {} teu pai é corno\n', 5.555, (10-4)*2 )

@@ -8,12 +8,12 @@ public class Parser {
 
     public static void main(String[] args) {
         String[] oi = new String[2];
-        oi[0] = "double a = 20+5";
-        oi[1] = "a = 5+10";
+        oi[0] = "int a = 4598";
+        oi[1] = "print('else fodase {} {} teu pai é corno\n', 5.555, a )";
 
         Parser alo = new Parser();
         alo.parseLines(oi);
-        System.out.println(alo.variables.get("a").getValue());
+        // System.out.println(alo.variables.get("a").getValue());
     }
 
     Parser(){
@@ -24,8 +24,50 @@ public class Parser {
     public void parseLines(String[] lines){
         for (int i = 0; i < lines.length ; i++) {
         
+            //Verifica se tem print
+            if(lines[i].indexOf("print") != -1){
+                if(lines[i].indexOf("(") != -1 && lines[i].indexOf(")") != -1 ){
+                    int first = lines[i].indexOf("'");
+                    int second = lines[i].indexOf("'", first+1);
+                    String inQuotes = lines[i].substring(first+1, second);
+                    
+                    if(inQuotes.indexOf("{}") != -1){
+                        if(lines[i].indexOf(",", second) == -1){
+                            System.out.println("Não foram encontradas variaveis para imprimir");
+                            System.exit(0);
+                        }
+                        String [] inComma = (lines[i].substring(lines[i].indexOf(",", second), lines[i].length()-1)).split(",");
+                        for(int j = 1; j < inComma.length; j++){
+                            inComma[j] = inComma[j].trim();
+                        }
+
+                        for(int k = 1; k < inComma.length; k++){
+                            if(inQuotes.indexOf("{}") != -1){
+                                //Function da Stefani. Se chamar essa function, n precisa do if abaixo :D
+
+                                if(variables.containsKey(inComma[k])){
+                                    inComma[k] = (variables.get(inComma[k]).getValue()).toString();
+                                }
+                                if(inComma[k].indexOf(".") != -1){
+                                    inQuotes = inQuotes.replaceFirst("\\{}", Operation.chooseOperation(inComma[k], "double").toString());
+                                } 
+                                else {
+                                    inQuotes = inQuotes.replaceFirst("\\{}", Operation.chooseOperation(inComma[k], "int").toString());
+                                }
+                            }
+                            else{
+                                System.out.println("Não foi possível imprimir");
+                                System.exit(0);
+                            }
+                        }
+                    }
+                    inQuotes = inQuotes.replace("\\n", "\n");
+                    System.out.printf(inQuotes);
+                } 
+            }
+
             //------Verifica se e int-----//
-            if(lines[i].indexOf("int") != -1){
+            else if(lines[i].indexOf("int") != -1){
                 VarInt integer;
                 String concatLine = "";
                 int equalPosition = lines[i].indexOf("=");

@@ -12,6 +12,5 @@ public class Sucury {
         Parser parser = new Parser();
         Teste.readFile(fileName);
         parser.parseLines(Teste.lines);
-        Teste.printFile();
     }
 }
