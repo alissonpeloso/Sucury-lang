@@ -1,15 +1,17 @@
 package fonte.sucury;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 public class Parser {
     public static int currentLine;
     protected Map<String, Variable> variables;
 
     public static void main(String[] args) {
-        String[] oi = new String[2];
-        oi[0] = "int a = 4598";
-        oi[1] = "print('else fodase {} {} teu pai é corno\n', 5.555, a )";
+        String[] oi = new String[3];
+        oi[0] = "string a";
+        oi[1] = "scan(a)";
+        oi[2] = "print('else fodase\n{} {} teu pai é corno\n', 5.555, a )";
 
         Parser alo = new Parser();
         alo.parseLines(oi);
@@ -26,110 +28,27 @@ public class Parser {
         
             //Verifica se tem print
             if(lines[i].indexOf("print") != -1){
-                if(lines[i].indexOf("(") != -1 && lines[i].indexOf(")") != -1 ){
-                    int first = lines[i].indexOf("'");
-                    int second = lines[i].indexOf("'", first+1);
-                    String inQuotes = lines[i].substring(first+1, second);
-                    
-                    if(inQuotes.indexOf("{}") != -1){
-                        if(lines[i].indexOf(",", second) == -1){
-                            System.out.println("Não foram encontradas variaveis para imprimir");
-                            System.exit(0);
-                        }
-                        String [] inComma = (lines[i].substring(lines[i].indexOf(",", second), lines[i].length()-1)).split(",");
-                        for(int j = 1; j < inComma.length; j++){
-                            inComma[j] = inComma[j].trim();
-                        }
-
-                        for(int k = 1; k < inComma.length; k++){
-                            if(inQuotes.indexOf("{}") != -1){
-                                //Function da Stefani. Se chamar essa function, n precisa do if abaixo :D
-
-                                if(variables.containsKey(inComma[k])){
-                                    inComma[k] = (variables.get(inComma[k]).getValue()).toString();
-                                }
-                                if(inComma[k].indexOf(".") != -1){
-                                    inQuotes = inQuotes.replaceFirst("\\{}", Operation.chooseOperation(inComma[k], "double").toString());
-                                } 
-                                else {
-                                    inQuotes = inQuotes.replaceFirst("\\{}", Operation.chooseOperation(inComma[k], "int").toString());
-                                }
-                            }
-                            else{
-                                System.out.println("Não foi possível imprimir");
-                                System.exit(0);
-                            }
-                        }
-                    }
-                    inQuotes = inQuotes.replace("\\n", "\n");
-                    System.out.printf(inQuotes);
-                } 
+                printTreatment(lines[i]);
             }
 
             //------Verifica se e int-----//
             else if(lines[i].indexOf("int") != -1){
-                VarInt integer;
-                String concatLine = "";
-                int equalPosition = lines[i].indexOf("=");
-                String [] preEquals =Util.lineInWordArray(lines[i]);
-                
-                if(equalPosition != -1){ //Verifica se tem sinal de =
-                    preEquals = Util.lineInWordArray(lines[i].substring(0, equalPosition));
-                    String[] posEquals = Util.lineInWordArray(lines[i].substring(equalPosition+1, lines[i].length()));
-                    for(int j = 0 ; j < posEquals.length ; j++){  //coloca td expressao em uma unica string
-                        concatLine = concatLine.concat(posEquals[j]);
-                    }
-                    int value = (int) Operation.chooseOperation(concatLine, "int");
-                    integer = new VarInt(preEquals[1], value);
-                }
-                else{
-                    integer = new VarInt(preEquals[1]);
-                }
-                variables.put(integer.name, integer);
+                intTreatment(lines[i]);
             } 
 
             //------Verifica se e float-----//
             else if(lines[i].indexOf("float") != -1){
-                VarFloat pfloat;
-                String concatLine = "";
-                int equalPosition = lines[i].indexOf("=");
-                String [] preEquals =Util.lineInWordArray(lines[i]);
-
-                if(equalPosition != -1){ //Verifica se tem sinal de =
-                    preEquals = Util.lineInWordArray(lines[i].substring(0, equalPosition));
-                    String[] posEquals = Util.lineInWordArray(lines[i].substring(equalPosition+1, lines[i].length()));
-                    for(int j = 0 ; j < posEquals.length ; j++){  //coloca td expressao em uma unica string
-                        concatLine = concatLine.concat(posEquals[j]);
-                    }
-                    float value = (float) Operation.chooseOperation(concatLine, "float");
-                    pfloat = new VarFloat(preEquals[1], value);
-                }
-                else{
-                    pfloat = new VarFloat(preEquals[1]);
-                }
-                variables.put(pfloat.name, pfloat);
+                floatTreatment(lines[i]);
             } 
 
             //------Verifica se e double-----//
             else if(lines[i].indexOf("double") != -1){
-                VarDouble pfloat;
-                String concatLine = "";
-                int equalPosition = lines[i].indexOf("=");
-                String [] preEquals =Util.lineInWordArray(lines[i]);
+                doubleTreatment(lines[i]);
+            }
 
-                if(equalPosition != -1){ //Verifica se tem sinal de =
-                    preEquals = Util.lineInWordArray(lines[i].substring(0, equalPosition));
-                    String[] posEquals = Util.lineInWordArray(lines[i].substring(equalPosition+1, lines[i].length()));
-                    for(int j = 0 ; j < posEquals.length ; j++){  //coloca td expressao em uma unica string
-                        concatLine = concatLine.concat(posEquals[j]);
-                    }
-                    double value = (double) Operation.chooseOperation(concatLine, "double");
-                    pfloat = new VarDouble(preEquals[1], value);
-                }
-                else{
-                    pfloat = new VarDouble(preEquals[1]);
-                }
-                variables.put(pfloat.name, pfloat);
+            //------Verifica se eh scan-----//
+            else if(lines[i].indexOf("scan") != -1){
+                scanTreatment(lines[i]);
             }
 
             else{
@@ -163,6 +82,138 @@ public class Parser {
                     }
                 }
             }
+        }
+    }
+
+    private void printTreatment(String line){
+        if(line.indexOf("(") != -1 && line.indexOf(")") != -1 ){
+            int first = line.indexOf("'");
+            int second = line.indexOf("'", first+1);
+            String inQuotes = line.substring(first+1, second);
+            
+            if(inQuotes.indexOf("{}") != -1){
+                if(line.indexOf(",", second) == -1){
+                    System.out.println("Não foram encontradas variaveis para imprimir");
+                    System.exit(0);
+                }
+                String [] inComma = (line.substring(line.indexOf(",", second), line.length()-1)).split(",");
+                for(int j = 1; j < inComma.length; j++){
+                    inComma[j] = inComma[j].trim();
+                }
+
+                for(int k = 1; k < inComma.length; k++){
+                    if(inQuotes.indexOf("{}") != -1){
+                        //Function da Stefani. Se chamar essa function, n precisa do if abaixo :D
+
+                        if(variables.containsKey(inComma[k])){
+                            inComma[k] = (variables.get(inComma[k]).getValue()).toString();
+                        }
+                        if(inComma[k].indexOf(".") != -1){
+                            inQuotes = inQuotes.replaceFirst("\\{}", Operation.chooseOperation(inComma[k], "double").toString());
+                        } 
+                        else {
+                            inQuotes = inQuotes.replaceFirst("\\{}", Operation.chooseOperation(inComma[k], "int").toString());
+                        }
+                    }
+                    else{
+                        System.out.println("Não foi possível imprimir");
+                        System.exit(0);
+                    }
+                }
+            }
+            inQuotes = inQuotes.replace("\\n", "\n");
+            System.out.printf(inQuotes);
+        } 
+    }
+
+    //TODO: juntar tudo as função pia
+    private void intTreatment(String line){
+        VarInt integer;
+        String concatLine = "";
+        int equalPosition = line.indexOf("=");
+        String [] preEquals =Util.lineInWordArray(line);
+        
+        if(equalPosition != -1){ //Verifica se tem sinal de =
+            preEquals = Util.lineInWordArray(line.substring(0, equalPosition));
+            String[] posEquals = Util.lineInWordArray(line.substring(equalPosition+1, line.length()));
+            for(int j = 0 ; j < posEquals.length ; j++){  //coloca td expressao em uma unica string
+                concatLine = concatLine.concat(posEquals[j]);
+            }
+            int value = (int) Operation.chooseOperation(concatLine, "int");
+            integer = new VarInt(preEquals[1], value);
+        }
+        else{
+            integer = new VarInt(preEquals[1]);
+        }
+        variables.put(integer.name, integer);
+    }
+
+    private void floatTreatment(String line){
+        VarFloat pfloat;
+        String concatLine = "";
+        int equalPosition = line.indexOf("=");
+        String [] preEquals =Util.lineInWordArray(line);
+
+        if(equalPosition != -1){ //Verifica se tem sinal de =
+            preEquals = Util.lineInWordArray(line.substring(0, equalPosition));
+            String[] posEquals = Util.lineInWordArray(line.substring(equalPosition+1, line.length()));
+            for(int j = 0 ; j < posEquals.length ; j++){  //coloca td expressao em uma unica string
+                concatLine = concatLine.concat(posEquals[j]);
+            }
+            float value = (float) Operation.chooseOperation(concatLine, "float");
+            pfloat = new VarFloat(preEquals[1], value);
+        }
+        else{
+            pfloat = new VarFloat(preEquals[1]);
+        }
+        variables.put(pfloat.name, pfloat);
+    }
+
+    private void doubleTreatment(String line){
+        VarDouble pfloat;
+        String concatLine = "";
+        int equalPosition = line.indexOf("=");
+        String [] preEquals =Util.lineInWordArray(line);
+
+        if(equalPosition != -1){ //Verifica se tem sinal de =
+            preEquals = Util.lineInWordArray(line.substring(0, equalPosition));
+            String[] posEquals = Util.lineInWordArray(line.substring(equalPosition+1, line.length()));
+            for(int j = 0 ; j < posEquals.length ; j++){  //coloca td expressao em uma unica string
+                concatLine = concatLine.concat(posEquals[j]);
+            }
+            double value = (double) Operation.chooseOperation(concatLine, "double");
+            pfloat = new VarDouble(preEquals[1], value);
+        }
+        else{
+            pfloat = new VarDouble(preEquals[1]);
+        }
+        variables.put(pfloat.name, pfloat);
+    }
+
+    //TODO: tratamento para Strings
+    private void scanTreatment(String line){
+        String variable = line.substring(line.indexOf("(")+1, line.indexOf(")"));
+        if(variables.containsKey(variable)){
+            Scanner scan = new Scanner(System.in);
+            String lineScan = scan.nextLine();
+            scan.close();
+
+            if (variables.get(variable).type.equals("int")) {
+                variables.get(variable).setValue(Integer.parseInt(lineScan));
+            }
+            else if (variables.get(variable).type.equals("float")) {
+                variables.get(variable).setValue(Float.parseFloat(lineScan));
+            }
+            else if (variables.get(variable).type.equals("double")) {
+                variables.get(variable).setValue(Double.parseDouble(lineScan));
+            }
+            else {
+                variables.get(variable).setValue(lineScan);
+            }
+        }
+        else{
+            System.out.println("Variável não encontrada");
+            System.exit(0);
         }
     }
 }
