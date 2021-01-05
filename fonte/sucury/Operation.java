@@ -116,7 +116,7 @@ public class Operation {
                 }
             }
         }
-    
+        values[0] = Operation.variableReplacement(values[0], variables);
         if(type.equals("float")){
             result = Float.parseFloat(values[0]);
         }

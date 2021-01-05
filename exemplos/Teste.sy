@@ -1,0 +1,12 @@
+int a = 5
+if (a == 5)
+    if (a != 4)
+        print ('quero que se foda\n')
+        if (a != 3)
+            print ('int a = 6 marilene\n')
+        endif
+    endif
+    print ('desque\n')
+endif
+print ('foi bom pra vc? :3\n')
+print ('esse aqui é o a = {}\n',a)

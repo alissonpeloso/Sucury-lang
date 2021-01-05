@@ -9,10 +9,13 @@ public class Parser {
     protected Map<String, Variable> variables;
     
     public static void main(String[] args) {
-        String[] oi = new String[3];
+        String[] oi = new String[5];
         oi[0] = "int     antenor          =        (10-(3+4))*              (2+(23-5))";
-        oi[1] = "string bisteca";
-        oi[2] = "bisteca = 'cabeludo'";
+        oi[1] = "if(6==5)";
+        oi[2] = "   print('oi\n')";
+        oi[3] = "endif";
+        oi[4] = "print('saiu do endif\n')";
+
 
         Parser alo = new Parser();
         alo.parseLines(oi);
@@ -26,7 +29,9 @@ public class Parser {
 
     public void parseLines(String[] lines){
         for (int i = 0; i < lines.length ; i++) {
-        
+            // Pattern.compile("^[print]").matcher(lines[i]).find()
+            //todo: precisamos ajustar a verificação com idexof com o regex @stefz
+
             //Verifica se tem print
             if(lines[i].indexOf("print") != -1){
                 printTreatment(lines[i]);
@@ -54,6 +59,11 @@ public class Parser {
             else if(lines[i].indexOf("scan") != -1){
                 scanTreatment(lines[i]);
             }
+            //------Verifica se eh if-----//
+            else if(lines[i].indexOf("if") != -1){
+                i = ifTreatment(lines, i);
+            }
+
 
             else{
                 String concatLine = "";
@@ -257,6 +267,29 @@ public class Parser {
             System.out.println("Variável não encontrada");
             System.exit(0);
         }
+    }
+    private int ifTreatment(String[] lines, int pos){
+        int count = 1;
+        int firstParenth = lines[pos].indexOf("(");
+        int lastParenth = lines[pos].lastIndexOf(")");
+        String condition = lines[pos].substring(firstParenth+1,lastParenth);
+        String [] parseInsideIf = new String[0];
+        while(count > 0){
+            pos++;
+            parseInsideIf = Util.appendArray(parseInsideIf.length, parseInsideIf, lines[pos]);
+            if(lines[pos].indexOf("endif") != -1){
+                count--;
+            }
+            else if(lines[pos].indexOf("if") != -1){
+                count++;
+            }
+        }
+        if(Condition.isTrue(condition, variables)){
+            parseInsideIf = Util.removeArray(parseInsideIf.length, parseInsideIf, parseInsideIf.length-1);
+            parseLines(parseInsideIf);
+        }
+
+        return pos++;
     }
 
     private void printVariables(){
