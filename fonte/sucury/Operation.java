@@ -5,7 +5,7 @@ public class Operation {
         String[] aux = content.split("");
         String[] newContent = new String[0];
         String concat = "";
-
+        //fon
         for(int i = 0; i < aux.length; i++){
             if(aux[i].equals("+") || aux[i].equals("-") || aux[i].equals("*") || aux[i].equals("/") || aux[i].equals("%") || aux[i].equals("(") || aux[i].equals(")")){
                 if(!concat.equals("")){
