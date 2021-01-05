@@ -1,4 +1,6 @@
 package fonte.sucury;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 public class Operation {
     public static String[] treatment(String content){
@@ -33,7 +35,7 @@ public class Operation {
         return newContent;
     }
 
-    public static Object chooseOperation(String content, String type){
+    public static Object chooseOperation(String content, String type, Map<String, Variable> variables){
         String [] values = treatment(content);
         Object result = new Object();
         
@@ -45,7 +47,7 @@ public class Operation {
                     for(j = i+1; !values[j].equals(")"); j++){
                         part = part.concat(values[j]);
                     }
-                    Object parenthResult = chooseOperation(part, type);
+                    Object parenthResult = chooseOperation(part, type, variables);
                     values[i] = parenthResult.toString();
                     for(j = i+1; !values[j].equals(")"); j++){
                         values = Util.removeArray(values.length, values, j);
@@ -59,6 +61,8 @@ public class Operation {
         if(content.indexOf("+") != -1 || content.indexOf("-") != -1 || content.indexOf("*") != -1 || content.indexOf("/") != -1 || content.indexOf("%") != -1){
             for(int i = 0; i < values.length; i++){
                 if(values[i].equals("*")){
+                    values[i+1] = Operation.variableReplacement(values[i+1], variables);
+                    values[i-1] = Operation.variableReplacement(values[i-1],variables);
                     result = mult(values, type, i-1, i+1);
                     values[i-1] = result.toString();
                     values = Util.removeArray(values.length, values, i);
@@ -68,6 +72,8 @@ public class Operation {
             }
             for(int i = 0; i < values.length; i++){
                 if(values[i].equals("/")){
+                    values[i+1] = Operation.variableReplacement(values[i+1], variables);
+                    values[i-1] = Operation.variableReplacement(values[i-1],variables);
                     result = div(values, type, i-1, i+1);
                     values[i-1] = result.toString();
                     values = Util.removeArray(values.length, values, i);
@@ -77,6 +83,8 @@ public class Operation {
             }
             for(int i = 0; i < values.length; i++){
                 if(values[i].equals("%")){
+                    values[i+1] = Operation.variableReplacement(values[i+1], variables);
+                    values[i-1] = Operation.variableReplacement(values[i-1],variables);
                     result = mod(values, type, i-1, i+1);
                     values[i-1] = result.toString();
                     values = Util.removeArray(values.length, values, i);
@@ -86,7 +94,8 @@ public class Operation {
             }
             for(int i = 0; i < values.length; i++){
                 if(values[i].equals("+")){
-                    
+                    values[i+1] = Operation.variableReplacement(values[i+1], variables);
+                    values[i-1] = Operation.variableReplacement(values[i-1],variables);
                     result = sum(values, type, i-1, i+1);
                     values[i-1] = result.toString();
                     values = Util.removeArray(values.length, values, i);
@@ -97,6 +106,8 @@ public class Operation {
             }
             for(int i = 0; i < values.length; i++){
                 if(values[i].equals("-")){
+                    values[i+1] = Operation.variableReplacement(values[i+1], variables);
+                    values[i-1] = Operation.variableReplacement(values[i-1],variables);
                     result = sub(values, type, i-1, i+1);
                     values[i-1] = result.toString();
                     values = Util.removeArray(values.length, values, i);
@@ -224,5 +235,14 @@ public class Operation {
             String splitQuotes[] = inQuotes.split("'");    
             return splitQuotes[1];
         }
+    }
+    private static String variableReplacement(String operand, Map<String, Variable> variables){
+        if (variables.containsKey(operand)){
+            return variables.get(operand).getValue().toString();
+        } else if(!Pattern.compile("^[\\-]{0,1}[0-9]*[.]{0,1}[0-9]+$").matcher(operand).find()){
+            System.out.println("Variável não encontrada "+operand);
+            System.exit(0);
+        }
+        return operand;
     }
 }

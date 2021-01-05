@@ -26,10 +26,11 @@ public class Util {
         String words[] = line.split(" ");
         String withoutSpaces[] = new String[0];
         for(int i = 0; i < words.length; i++){
-            if(!" ".equals(words[i])){
+            if(!"".equals(words[i])){
                 withoutSpaces = appendArray(withoutSpaces.length, withoutSpaces, words[i]);
             }
         }
+
         return withoutSpaces;
     }
 }

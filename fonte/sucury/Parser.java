@@ -2,24 +2,21 @@ package fonte.sucury;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 public class Parser {
     public static int currentLine;
     protected Map<String, Variable> variables;
     
     public static void main(String[] args) {
-        String[] oi = new String[2];
-        oi[0] = "int a = (10-(3+4))*(2+(23-5))";
-        oi[1] = "String b = 'candamandapiano'";
+        String[] oi = new String[3];
+        oi[0] = "int     antenor          =        (10-(3+4))*              (2+(23-5))";
+        oi[1] = "string bisteca";
+        oi[2] = "bisteca = 'cabeludo'";
 
         Parser alo = new Parser();
         alo.parseLines(oi);
-        System.out.println(alo.variables.get("a").getValue());
-        // System.out.println(alo.variables.get("b").getValue());
-
-        Variable test = alo.variables.get("b");
-        System.out.println(test.name);
-        System.out.println(test.value);
+        alo.printVariables();
     }
 
     Parser(){
@@ -50,7 +47,7 @@ public class Parser {
                 doubleTreatment(lines[i]);
             }
             //------Verifica se e String-----//
-            else if(lines[i].indexOf("String") !=-1){
+            else if(lines[i].indexOf("string") !=-1){
                 stringTreatment(lines[i]);
             }
             //------Verifica se eh scan-----//
@@ -75,21 +72,20 @@ public class Parser {
                             concatLine = concatLine.concat(posEquals[j]);
                         }
                         if(search.type.equals("int")){
-                            int value = (int) Operation.chooseOperation(concatLine, "int");
+                            int value = (int) Operation.chooseOperation(concatLine, "int", variables);
                             search.setValue(value);
                         }
                         else if(search.type.equals("float")){
-                            float value = (float) Operation.chooseOperation(concatLine, "float");
+                            float value = (float) Operation.chooseOperation(concatLine, "float", variables);
                             search.setValue(value);
                         }
                         else if(search.type.equals("double")){
-                            double value = (double) Operation.chooseOperation(concatLine, "double");
+                            double value = (double) Operation.chooseOperation(concatLine, "double", variables);
                             search.setValue(value);
                         }
-                        else if(search.type.equals("String")){
+                        else if(search.type.equals("string")){
                             String value = Operation.concatAfterDeclaration(lines[i]);
                             search.setValue(value);
-                            System.out.println(value);
                         }
                     }
                 }
@@ -120,11 +116,16 @@ public class Parser {
                         if(variables.containsKey(inComma[k])){
                             inComma[k] = (variables.get(inComma[k]).getValue()).toString();
                         }
-                        if(inComma[k].indexOf(".") != -1){
-                            inQuotes = inQuotes.replaceFirst("\\{}", Operation.chooseOperation(inComma[k], "double").toString());
-                        } 
-                        else {
-                            inQuotes = inQuotes.replaceFirst("\\{}", Operation.chooseOperation(inComma[k], "int").toString());
+                        if(Pattern.compile("^[\\-]{0,1}[0-9]*[.]{0,1}[0-9]+$").matcher(inComma[k]).find()){
+                            if(inComma[k].indexOf(".") != -1){
+                                inQuotes = inQuotes.replaceFirst("\\{}", Operation.chooseOperation(inComma[k], "double", variables).toString());
+                            } 
+                            else {
+                                inQuotes = inQuotes.replaceFirst("\\{}", Operation.chooseOperation(inComma[k], "int", variables).toString());
+                            }
+                        }
+                        else{
+                            inQuotes = inQuotes.replaceFirst("\\{}", inComma[k]);
                         }
                     }
                     else{
@@ -151,7 +152,7 @@ public class Parser {
             for(int j = 0 ; j < posEquals.length ; j++){  //coloca td expressao em uma unica string
                 concatLine = concatLine.concat(posEquals[j]);
             }
-            int value = (int) Operation.chooseOperation(concatLine, "int");
+            int value = (int) Operation.chooseOperation(concatLine, "int", variables);
             integer = new VarInt(preEquals[1], value);
         }
         else{
@@ -172,7 +173,7 @@ public class Parser {
             for(int j = 0 ; j < posEquals.length ; j++){  //coloca td expressao em uma unica string
                 concatLine = concatLine.concat(posEquals[j]);
             }
-            float value = (float) Operation.chooseOperation(concatLine, "float");
+            float value = (float) Operation.chooseOperation(concatLine, "float", variables);
             pfloat = new VarFloat(preEquals[1], value);
         }
         else{
@@ -193,7 +194,7 @@ public class Parser {
             for(int j = 0 ; j < posEquals.length ; j++){  //coloca td expressao em uma unica string
                 concatLine = concatLine.concat(posEquals[j]);
             }
-            double value = (double) Operation.chooseOperation(concatLine, "double");
+            double value = (double) Operation.chooseOperation(concatLine, "double", variables);
             pfloat = new VarDouble(preEquals[1], value);
         }
         else{
@@ -208,8 +209,7 @@ public class Parser {
             
             String STRcomplete;
             String[] splitStr = line.split("=");
-            String SplitSpaces = splitStr[0].replaceAll(""," ");
-            String[] varName = SplitSpaces.split(" ");
+            String[] varName = Util.lineInWordArray(splitStr[0]);
             
             int first = line.indexOf("'");
             int second = line.lastIndexOf("'");
@@ -219,18 +219,15 @@ public class Parser {
             if(inQuotes.indexOf("+") != -1){
                 STRcomplete = Operation.concatString(inQuotes);
                 integer = new VarString(varName[1], STRcomplete);
-                // System.out.println(STRcomplete);
             }
             else{
                 String splitQuotes[] = inQuotes.split("'");
                 integer = new VarString(varName[1], splitQuotes[1]);
-                // System.out.println(splitQuotes[1]);
             }
         
         }
         else{
-            String SplitName = line.replaceAll(" ", "");
-            String[] varName = SplitName.split("string");
+            String[] varName = Util.lineInWordArray(line);
             integer = new VarString(varName[1]);
         }     
         variables.put(integer.name, integer);
@@ -259,6 +256,14 @@ public class Parser {
         else{
             System.out.println("Variável não encontrada");
             System.exit(0);
+        }
+    }
+
+    private void printVariables(){
+        System.out.println(" Variáveis ");
+        for (String key : variables.keySet()) {
+            Variable variable = variables.get(key);
+            System.out.println("Nome: "+key+" | Valor: "+variable.getValue()+" | Tipo: "+variable.type);
         }
     }
 }
