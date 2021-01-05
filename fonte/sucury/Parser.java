@@ -8,14 +8,12 @@ public class Parser {
     protected Map<String, Variable> variables;
 
     public static void main(String[] args) {
-        String[] oi = new String[3];
-        oi[0] = "string a";
-        oi[1] = "scan(a)";
-        oi[2] = "print('else fodase\n{} {} teu pai é corno\n', 5.555, a )";
+        String[] oi = new String[1];
+        oi[0] = "int a = (10-(3+4))*(2+(23-5))";
 
         Parser alo = new Parser();
         alo.parseLines(oi);
-        // System.out.println(alo.variables.get("a").getValue());
+        System.out.println(alo.variables.get("a").getValue());
     }
 
     Parser(){
@@ -46,7 +44,7 @@ public class Parser {
                 doubleTreatment(lines[i]);
             }
 
-            //------Verifica se eh scan-----//
+            //------Verifica se e scan-----//
             else if(lines[i].indexOf("scan") != -1){
                 scanTreatment(lines[i]);
             }

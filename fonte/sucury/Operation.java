@@ -38,7 +38,7 @@ public class Operation {
         Object result = new Object();
 
         if(content.indexOf("(") != -1){
-            for(int i = 0; i < values.length; i++){
+            for(int i = values.length-1; i >= 0 ; i--){
                 if(values[i].equals("(")){
                     int j;
                     String part = "";
