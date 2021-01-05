@@ -8,11 +8,9 @@ public class Parser {
     protected Map<String, Variable> variables;
 
     public static void main(String[] args) {
-        String[] oi = new String[3];
-        oi[0] = "string a";
-        oi[1] = "scan(a)";
-        oi[2] = "print('else fodase\n{} {} teu pai é corno\n', 5.555, a )";
-
+        String[] oi = new String[2];
+        oi[0] = "String a";
+        oi[1] = "a ='3'";
         Parser alo = new Parser();
         alo.parseLines(oi);
         // System.out.println(alo.variables.get("a").getValue());
@@ -45,7 +43,10 @@ public class Parser {
             else if(lines[i].indexOf("double") != -1){
                 doubleTreatment(lines[i]);
             }
-
+            //------Verifica se e String-----//
+            else if(lines[i].indexOf("String") !=-1){
+                stringTreatment(lines[i]);
+            }
             //------Verifica se eh scan-----//
             else if(lines[i].indexOf("scan") != -1){
                 scanTreatment(lines[i]);
@@ -56,9 +57,9 @@ public class Parser {
                 int equalPosition = lines[i].indexOf("=");
                 String [] preEquals = Util.lineInWordArray(lines[i].substring(0, equalPosition));
                 Variable search = this.variables.get(preEquals[0]);
-
                 if(search == null){
                     System.out.println("Variavel não encontrada!");
+                    
                     return;
                 }
                 else{
@@ -78,6 +79,11 @@ public class Parser {
                         else if(search.type.equals("double")){
                             double value = (double) Operation.chooseOperation(concatLine, "double");
                             search.setValue(value);
+                        }
+                        else if(search.type.equals("string")){
+                            String value = Operation.concatAfterDeclaration(lines[i]);
+                            search.setValue(value);
+                            System.out.println(value);
                         }
                     }
                 }
@@ -189,7 +195,40 @@ public class Parser {
         }
         variables.put(pfloat.name, pfloat);
     }
-
+    
+    private void stringTreatment(String line){
+        VarString integer;
+        if(line.indexOf("=") != -1){
+            
+            String STRcomplete;
+            String[] splitStr = line.split("=");
+            String SplitSpaces = splitStr[0].replaceAll(""," ");
+            String[] varName = SplitSpaces.split(" ");
+            
+            int first = line.indexOf("'");
+            int second = line.lastIndexOf("'");
+            
+            String inQuotes = line.substring(first, second+1);
+            
+            if(inQuotes.indexOf("+") != -1){
+                STRcomplete= Operation.concatString(inQuotes);
+                integer = new VarString(varName[1], STRcomplete);
+                System.out.println(STRcomplete);
+            }
+            else{
+                String splitQuotes[] = inQuotes.split("'");
+                integer = new VarString(varName[1], splitQuotes[1]);
+                System.out.println(splitQuotes[1]);
+            }
+        
+        }
+        else{
+            String SplitName = line.replaceAll(" ", "");
+            String[] varName = SplitName.split("String");
+            integer = new VarString(varName[1]);
+        }     
+        variables.put(integer.name, integer);
+    }
     //TODO: tratamento para Strings
     private void scanTreatment(String line){
         String variable = line.substring(line.indexOf("(")+1, line.indexOf(")"));

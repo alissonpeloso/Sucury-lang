@@ -36,7 +36,7 @@ public class Operation {
     public static Object chooseOperation(String content, String type){
         String [] values = treatment(content);
         Object result = new Object();
-
+        
         if(content.indexOf("(") != -1){
             for(int i = 0; i < values.length; i++){
                 if(values[i].equals("(")){
@@ -55,7 +55,7 @@ public class Operation {
                 }
             }
         }
-
+        
         if(content.indexOf("+") != -1 || content.indexOf("-") != -1 || content.indexOf("*") != -1 || content.indexOf("/") != -1 || content.indexOf("%") != -1){
             for(int i = 0; i < values.length; i++){
                 if(values[i].equals("*")){
@@ -86,11 +86,13 @@ public class Operation {
             }
             for(int i = 0; i < values.length; i++){
                 if(values[i].equals("+")){
+                    
                     result = sum(values, type, i-1, i+1);
                     values[i-1] = result.toString();
                     values = Util.removeArray(values.length, values, i);
                     values = Util.removeArray(values.length, values, i);
                     i--;
+                    
                 }
             }
             for(int i = 0; i < values.length; i++){
@@ -113,6 +115,9 @@ public class Operation {
         if(type.equals("double")){
             result = Double.parseDouble(values[0]);
         }
+        
+        
+        
         return result;
     }
 
@@ -194,5 +199,30 @@ public class Operation {
             return result;
         }
         return 0;
+    }
+    public static String concatString(String inQuotes){
+        String concatenada="";
+        String splitQuotes[] = inQuotes.split("'");
+            for(int i=1;i<=splitQuotes.length-1;i+=2){
+                concatenada= concatenada.concat(splitQuotes[i]);
+                concatenada= concatenada.concat(" ");
+        }
+        return concatenada;
+    }
+    public static String concatAfterDeclaration(String line){
+        String STRcomplete;
+        int first = line.indexOf("'");
+        int second = line.lastIndexOf("'");
+            
+        String inQuotes = line.substring(first, second+1);
+            
+        if(inQuotes.indexOf("+") != -1){
+            STRcomplete= Operation.concatString(inQuotes);   
+            return STRcomplete;
+        }
+        else{
+            String splitQuotes[] = inQuotes.split("'");    
+            return splitQuotes[1];
+        }
     }
 }
