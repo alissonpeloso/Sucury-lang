@@ -6,7 +6,7 @@ import java.util.Scanner;
 public class Parser {
     public static int currentLine;
     protected Map<String, Variable> variables;
-    //fon
+    
     public static void main(String[] args) {
         String[] oi = new String[2];
         oi[0] = "String a";
