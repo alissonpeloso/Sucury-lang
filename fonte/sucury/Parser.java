@@ -9,14 +9,11 @@ public class Parser {
     protected Map<String, Variable> variables;
     
     public static void main(String[] args) {
-        String[] oi = new String[5];
-        oi[0] = "int     antenor          =        (10-(3+4))*              (2+(23-5))";
-        oi[1] = "if(6==5)";
-        oi[2] = "   print('oi\n')";
-        oi[3] = "endif";
-        oi[4] = "print('saiu do endif\n')";
+        String[] oi = new String[2];
 
-
+        oi[0] = "int a = 5";
+        oi[1] = "a --";
+        
         Parser alo = new Parser();
         alo.parseLines(oi);
         alo.printVariables();
@@ -58,39 +55,16 @@ public class Parser {
             else if(Pattern.compile("^\\s*if[\\s]*[(]").matcher(lines[i]).find()){
                 i = ifTreatment(lines, i);
             }
-            else{
-                String concatLine = "";
-                int equalPosition = lines[i].indexOf("=");
-                String [] preEquals = Util.lineInWordArray(lines[i].substring(0, equalPosition));
-                Variable search = this.variables.get(preEquals[0]);
-                if(search == null){
-                    System.out.println("Variavel não encontrada!");
-                    return;
-                }
-                else{
-                    if(equalPosition != -1){ //Verifica se tem sinal de =
-                        String[] posEquals = Util.lineInWordArray(lines[i].substring(equalPosition+1, lines[i].length()));
-                        for(int j = 0 ; j < posEquals.length ; j++){  //coloca td expressao em uma unica string
-                            concatLine = concatLine.concat(posEquals[j]);
-                        }
-                        if(search.type.equals("int")){
-                            int value = (int) Operation.chooseOperation(concatLine, "int", variables);
-                            search.setValue(value);
-                        }
-                        else if(search.type.equals("float")){
-                            float value = (float) Operation.chooseOperation(concatLine, "float", variables);
-                            search.setValue(value);
-                        }
-                        else if(search.type.equals("double")){
-                            double value = (double) Operation.chooseOperation(concatLine, "double", variables);
-                            search.setValue(value);
-                        }
-                        else if(search.type.equals("string")){
-                            String value = Operation.concatAfterDeclaration(lines[i]);
-                            search.setValue(value);
-                        }
-                    }
-                }
+            //------Verifica se é for-----//
+            else if(Pattern.compile("^\\s*for[\\s]*[(]").matcher(lines[i]).find()){
+                i = forTreatment(lines, i);
+            }
+            //------Verifica se é while-----//
+            else if(Pattern.compile("^\\s*while[\\s]*[(]").matcher(lines[i]).find()){
+                i = whileTreatment(lines, i);
+            }
+            else if(!Pattern.compile("^\\s*$").matcher(lines[i]).find()){
+                variableTreatment(lines[i]);
             }
         }
     }
@@ -113,12 +87,11 @@ public class Parser {
 
                 for(int k = 1; k < inComma.length; k++){
                     if(inQuotes.indexOf("{}") != -1){
-                        //Function da Stefani. Se chamar essa function, n precisa do if abaixo :D
 
                         if(variables.containsKey(inComma[k])){
                             inComma[k] = (variables.get(inComma[k]).getValue()).toString();
                         }
-                        if(Pattern.compile("^[\\-]{0,1}[0-9]*[.]{0,1}[0-9]+$").matcher(inComma[k]).find()){
+                        else{
                             if(inComma[k].indexOf(".") != -1){
                                 inQuotes = inQuotes.replaceFirst("\\{}", Operation.chooseOperation(inComma[k], "double", variables).toString());
                             } 
@@ -126,9 +99,7 @@ public class Parser {
                                 inQuotes = inQuotes.replaceFirst("\\{}", Operation.chooseOperation(inComma[k], "int", variables).toString());
                             }
                         }
-                        else{
-                            inQuotes = inQuotes.replaceFirst("\\{}", inComma[k]);
-                        }
+                        inQuotes = inQuotes.replaceFirst("\\{}", inComma[k]);
                     }
                     else{
                         System.out.println("Não foi possível imprimir");
@@ -234,7 +205,7 @@ public class Parser {
         }     
         variables.put(integer.name, integer);
     }
-    //TODO: tratamento para Strings
+
     private void scanTreatment(String line){
         String variable = line.substring(line.indexOf("(")+1, line.indexOf(")"));
         if(variables.containsKey(variable)){
@@ -260,28 +231,220 @@ public class Parser {
             System.exit(0);
         }
     }
-    private int ifTreatment(String[] lines, int pos){
-        int count = 1;
-        int firstParenth = lines[pos].indexOf("(");
-        int lastParenth = lines[pos].lastIndexOf(")");
-        String condition = lines[pos].substring(firstParenth+1,lastParenth);
+
+    private int ifTreatment(String[] lines, int posLine){
+        int countIf = 1;
+        int firstParenth = lines[posLine].indexOf("(");
+        int lastParenth = lines[posLine].lastIndexOf(")");
+        String condition = lines[posLine].substring(firstParenth+1,lastParenth);
         String [] parseInsideIf = new String[0];
-        while(count > 0){
-            pos++;
-            parseInsideIf = Util.appendArray(parseInsideIf.length, parseInsideIf, lines[pos]);
-            if(lines[pos].indexOf("endif") != -1){
-                count--;
+        String [] parseInsideElse = new String[0];
+
+        boolean findElse = false; // diz se encontramos um else nas linhas a partir do if
+
+        while(countIf > 0){
+            posLine++;
+
+            if(!findElse){
+                parseInsideIf = Util.appendArray(parseInsideIf.length, parseInsideIf, lines[posLine]);
             }
-            else if(lines[pos].indexOf("if") != -1){
-                count++;
+            else{
+                parseInsideElse = Util.appendArray(parseInsideElse.length, parseInsideElse, lines[posLine]);
+            }
+
+            if(lines[posLine].indexOf("else") != -1 && countIf == 1){
+                findElse = true;
+            }
+            if(lines[posLine].indexOf("endif") != -1){
+                countIf--;
+            }
+            else if(lines[posLine].indexOf("if") != -1){
+                countIf++;
             }
         }
         if(Condition.isTrue(condition, variables)){
             parseInsideIf = Util.removeArray(parseInsideIf.length, parseInsideIf, parseInsideIf.length-1);
             parseLines(parseInsideIf);
         }
+        else{
+            parseInsideElse = Util.removeArray(parseInsideElse.length, parseInsideElse, parseInsideElse.length-1);
+            parseLines(parseInsideElse);
+        }
+        if(posLine+1 > lines.length){
+            return posLine;
+        }
+        return posLine++;
+    }
 
-        return pos++;
+    private int forTreatment(String[] lines, int posLine){
+        int countFor = 1;
+        int firstParenth = lines[posLine].indexOf("(");
+        int lastParenth = lines[posLine].lastIndexOf(")");
+        String [] forController = lines[posLine].substring(firstParenth+1,lastParenth).split(";");
+
+        String [] parseInsideFor = new String[0];
+        while(countFor > 0){
+            posLine++;
+            parseInsideFor = Util.appendArray(parseInsideFor.length, parseInsideFor, lines[posLine]);
+            
+            if(lines[posLine].indexOf("endfor") != -1){
+                countFor--;
+            }
+            else if(lines[posLine].indexOf("for") != -1){
+                countFor++;
+            }
+        }
+        parseInsideFor = Util.removeArray(parseInsideFor.length, parseInsideFor, parseInsideFor.length-1);
+
+        if(forController[0].indexOf("int") != -1){
+            intTreatment(forController[0]);
+        }
+        else if(forController[0].indexOf("=") != -1){
+            variableTreatment(forController[0]);
+        }
+        else if(!variables.containsKey(forController[0].trim())){
+            System.out.println("Variavel não encontrada!");
+            System.exit(0);
+        }
+
+        while(Condition.isTrue(forController[1], variables)){
+            parseLines(parseInsideFor);
+            variableTreatment(forController[2]);
+        }
+        if(forController[0].indexOf("int") != -1){
+            String [] firstInstance = Util.lineInWordArray(forController[0].substring(0, forController[0].indexOf("=")));
+            variables.remove(firstInstance[1]);
+        }
+        
+        if(posLine+1 > lines.length){
+            return posLine;
+        }
+        return posLine++;
+    }
+
+    private int whileTreatment(String[] lines, int posLine){
+        int countWhile = 1;
+        int firstParenth = lines[posLine].indexOf("(");
+        int lastParenth = lines[posLine].lastIndexOf(")");
+        String condition = lines[posLine].substring(firstParenth+1,lastParenth);
+
+        String [] parseInsideWhile = new String[0];
+        while(countWhile > 0){
+            posLine++;
+            parseInsideWhile = Util.appendArray(parseInsideWhile.length, parseInsideWhile, lines[posLine]);
+            
+            if(lines[posLine].indexOf("endwhile") != -1){
+                countWhile--;
+            }
+            else if(lines[posLine].indexOf("while") != -1){
+                countWhile++;
+            }
+        }
+        parseInsideWhile = Util.removeArray(parseInsideWhile.length, parseInsideWhile, parseInsideWhile.length-1);
+
+        while(Condition.isTrue(condition, variables)){
+            parseLines(parseInsideWhile);
+        }
+        
+        if(posLine+1 > lines.length){
+            return posLine;
+        }
+        return posLine++;
+    }
+
+    private void variableTreatment(String line){
+        String concatLine = "";
+        String [] preOperator = new String[0];
+        String[] posOperator = new String[0];
+        int operatorPosition = 0;
+
+        if(line.indexOf("+=") != -1){
+            operatorPosition = line.indexOf("+=");
+            preOperator = Util.lineInWordArray(line.substring(0, operatorPosition));
+            posOperator = Util.lineInWordArray(line.substring(operatorPosition+2, line.length()));
+            concatLine += preOperator[0]+"+";
+            for(int j = 0 ; j < posOperator.length ; j++){  //coloca td expressao em uma unica string
+                concatLine = concatLine.concat(posOperator[j]);
+            }
+        }
+
+        else if(line.indexOf("-=") != -1){
+            operatorPosition = line.indexOf("-=");
+            preOperator = Util.lineInWordArray(line.substring(0, operatorPosition));
+            posOperator = Util.lineInWordArray(line.substring(operatorPosition+2, line.length()));
+            concatLine += preOperator[0]+"-";
+            for(int j = 0 ; j < posOperator.length ; j++){  //coloca td expressao em uma unica string
+                concatLine = concatLine.concat(posOperator[j]);
+            }
+        }
+
+        else if(line.indexOf("*=") != -1){
+            operatorPosition = line.indexOf("*=");
+            preOperator = Util.lineInWordArray(line.substring(0, operatorPosition));
+            posOperator = Util.lineInWordArray(line.substring(operatorPosition+2, line.length()));
+            concatLine += preOperator[0]+"*";
+            for(int j = 0 ; j < posOperator.length ; j++){  //coloca td expressao em uma unica string
+                concatLine = concatLine.concat(posOperator[j]);
+            }
+        }
+
+        else if(line.indexOf("/=") != -1){
+            operatorPosition = line.indexOf("/=");
+            preOperator = Util.lineInWordArray(line.substring(0, operatorPosition));
+            posOperator = Util.lineInWordArray(line.substring(operatorPosition+2, line.length()));
+            concatLine += preOperator[0]+"/";
+            for(int j = 0 ; j < posOperator.length ; j++){  //coloca td expressao em uma unica string
+                concatLine = concatLine.concat(posOperator[j]);
+            }
+        }
+
+        else if(line.indexOf("=") != -1){
+            operatorPosition = line.indexOf("=");
+            preOperator = Util.lineInWordArray(line.substring(0, operatorPosition));
+            posOperator = Util.lineInWordArray(line.substring(operatorPosition+1, line.length()));
+            for(int j = 0 ; j < posOperator.length ; j++){  //coloca td expressao em uma unica string
+                concatLine = concatLine.concat(posOperator[j]);
+            }
+        }
+
+        else if(line.indexOf("++") != -1){
+            operatorPosition = line.indexOf("++");
+            preOperator = Util.lineInWordArray(line.substring(0, operatorPosition));
+            concatLine += preOperator[0]+"+1";
+        }
+
+        else if(line.indexOf("--") != -1){
+            operatorPosition = line.indexOf("--");
+            preOperator = Util.lineInWordArray(line.substring(0, operatorPosition));
+            concatLine += preOperator[0]+"-1";
+        }
+
+        Variable search = this.variables.get(preOperator[0]);
+        if(search == null){
+            System.out.println("Variavel não encontrada!");
+            return;
+        }
+
+        else{
+            if(operatorPosition != -1){ //Verifica se tem sinal de =
+                if(search.type.equals("int")){
+                    int value = (int) Operation.chooseOperation(concatLine, "int", variables);
+                    search.setValue(value);
+                }
+                else if(search.type.equals("float")){
+                    float value = (float) Operation.chooseOperation(concatLine, "float", variables);
+                    search.setValue(value);
+                }
+                else if(search.type.equals("double")){
+                    double value = (double) Operation.chooseOperation(concatLine, "double", variables);
+                    search.setValue(value);
+                }
+                else if(search.type.equals("string")){
+                    String value = Operation.concatAfterDeclaration(line);
+                    search.setValue(value);
+                }
+            }
+        }        
     }
 
     private void printVariables(){
