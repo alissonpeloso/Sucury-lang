@@ -29,42 +29,35 @@ public class Parser {
 
     public void parseLines(String[] lines){
         for (int i = 0; i < lines.length ; i++) {
-            // Pattern.compile("^[print]").matcher(lines[i]).find()
-            //todo: precisamos ajustar a verificação com idexof com o regex @stefz
 
             //Verifica se tem print
-            if(lines[i].indexOf("print") != -1){
+            if(Pattern.compile("^\\s*print[\\s]*[(]").matcher(lines[i]).find()){
                 printTreatment(lines[i]);
             }
-
-            //------Verifica se e int-----//
-            else if(lines[i].indexOf("int") != -1){
+            //------Verifica se é int-----//
+            else if(Pattern.compile("^\\s*int\\s").matcher(lines[i]).find()){
                 intTreatment(lines[i]);
             } 
-
-            //------Verifica se e float-----//
-            else if(lines[i].indexOf("float") != -1){
+            //------Verifica se é float-----//
+            else if(Pattern.compile("^\\s*float\\s").matcher(lines[i]).find()){
                 floatTreatment(lines[i]);
             } 
-
-            //------Verifica se e double-----//
-            else if(lines[i].indexOf("double") != -1){
+            //------Verifica se é double-----//
+            else if(Pattern.compile("^\\s*double\\s").matcher(lines[i]).find()){
                 doubleTreatment(lines[i]);
             }
-            //------Verifica se e String-----//
-            else if(lines[i].indexOf("string") !=-1){
+            //------Verifica se é string-----//
+            else if(Pattern.compile("^\\s*string\\s").matcher(lines[i]).find()){
                 stringTreatment(lines[i]);
             }
-            //------Verifica se eh scan-----//
-            else if(lines[i].indexOf("scan") != -1){
+            //------Verifica se é scan-----//
+            else if(Pattern.compile("^\\s*scan[\\s]*[(]").matcher(lines[i]).find()){
                 scanTreatment(lines[i]);
             }
-            //------Verifica se eh if-----//
-            else if(lines[i].indexOf("if") != -1){
+            //------Verifica se é if-----//
+            else if(Pattern.compile("^\\s*if[\\s]*[(]").matcher(lines[i]).find()){
                 i = ifTreatment(lines, i);
             }
-
-
             else{
                 String concatLine = "";
                 int equalPosition = lines[i].indexOf("=");
@@ -72,7 +65,6 @@ public class Parser {
                 Variable search = this.variables.get(preEquals[0]);
                 if(search == null){
                     System.out.println("Variavel não encontrada!");
-                    
                     return;
                 }
                 else{
