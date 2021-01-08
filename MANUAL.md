@@ -10,6 +10,23 @@ Sucury-lang é flexível em relação aos espaçamentos e identação.
 
 ***
 ***
+## **Sumário**
+1. [**Variáveis**](#variáveis) 
+   - [**int**:](#int)
+   - [**double**:](#double)
+   - [**float**:](#float)
+   - [**string**:](#string)
+2. [**Operações**](#operações)
+3. [**Entrada e Saída**](#entrada-e-saída)
+   - [**Scan:**](#scan)
+   - [**Print:**](#print)
+4. [**Condições**](#condições)
+5. [**Laços**](#laços)
+   - [**while**:](#while)
+   - [**for**:](#for)
+6. [**Controlador de Fluxo**](#controlador-de-fluxo)
+***
+***
 
 ## **Variáveis**
 Para declaração de variáveis, utilizamos a síntaxe:
@@ -136,6 +153,7 @@ num /= 5
 ***
 
 ## **Entrada e Saída**
+### **scan:**
 Para entradas do teclado utilizamos o **scan**:
 
 Síntaxe:
@@ -154,25 +172,43 @@ scan(i)
 ```
 
 ***
+### **print:**
 
-Para saídas na tela utilizamos o **print**:
+Para saídas na tela utilizamos o **print** ou **println**. Ambos funcionam da mesma forma, porém o **println** adiciona um "\n" no final da linha automaticamente. 
+Para imprimir uma variável, podemos utilizar **print(variável)**.
 
 Síntaxe:
 
 ```
 print(texto)
+println(texto)
+```
+ou
+```
+print(variável)
+println(variável)
 ```
 - **OBS:** A variável precisa ser declarada anteriorimente
+  
+Para imprimir mais de uma variável ou variáveis juntamente com um texto, utiliza-se **{}** na síntaxe:
+
+```
+print('{} {}', var1, var2)
+println('texto {} {} {}', var1, var2, var3)
+```
 
 Exemplo de utilização:
-
 ```
 int idade = 5
 print('Oi! Eu tenho {} anos\n', idade)
+println(idade)
+println('boi')
 ```
 Saída:
 ```
 Oi! Eu tenho 5 anos
+5
+boi
 ```
 
 ***
@@ -182,6 +218,14 @@ Oi! Eu tenho 5 anos
 Sucury também pode utilizar de operadores condicionais.
 
 Sendo eles: **igual** (**==**), **diferente** (**!=**), **menor ou igual** (**<=**), maior ou igual (**>=**), **menor que** (**<**) e **maior que** (**>**).
+
+Também podemos verificar mais de uma condição utilizando operadores lógicos **and &&** e **or ||**. Além disso, podemos negar (inverter) a condição utilizando o **not !**.
+
+```
+if(!5 == 5 || 5 == 5)
+    println('true')
+endif
+```
 
 ***
 ***
