@@ -126,9 +126,6 @@ public class Operation {
         if(type.equals("double")){
             result = Double.parseDouble(values[0]);
         }
-        
-        
-        
         return result;
     }
 

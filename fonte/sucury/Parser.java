@@ -17,6 +17,8 @@ public class Parser {
         Parser alo = new Parser();
         alo.parseLines(oi);
         alo.printVariables();
+
+        System.out.println(Operation.chooseOperation("a", "int", alo.variables));
     }
 
     Parser(){
@@ -24,12 +26,21 @@ public class Parser {
         currentLine = 1;
     }
 
+    Parser(Map<String, Variable> variables){
+        this.variables = new HashMap<>();
+        this.variables.putAll(variables);
+    }
+
     public void parseLines(String[] lines){
         for (int i = 0; i < lines.length ; i++) {
 
-            //Verifica se tem print
+            //------Verifica se é print-----//
             if(Pattern.compile("^\\s*print[\\s]*[(]").matcher(lines[i]).find()){
-                printTreatment(lines[i]);
+                printTreatment(lines[i],false);
+            }
+            //------Verifica se é println-----//
+            else if(Pattern.compile("^\\s*println[\\s]*[(]").matcher(lines[i]).find()){
+                printTreatment(lines[i],true);
             }
             //------Verifica se é int-----//
             else if(Pattern.compile("^\\s*int\\s").matcher(lines[i]).find()){
@@ -69,50 +80,70 @@ public class Parser {
         }
     }
 
-    private void printTreatment(String line){
+    private void printTreatment(String line, boolean withLn){
         if(line.indexOf("(") != -1 && line.indexOf(")") != -1 ){
-            int first = line.indexOf("'");
-            int second = line.indexOf("'", first+1);
-            String inQuotes = line.substring(first+1, second);
-            
-            if(inQuotes.indexOf("{}") != -1){
-                if(line.indexOf(",", second) == -1){
-                    System.out.println("Não foram encontradas variaveis para imprimir");
-                    System.exit(0);
-                }
-                String [] inComma = (line.substring(line.indexOf(",", second), line.length()-1)).split(",");
-                for(int j = 1; j < inComma.length; j++){
-                    inComma[j] = inComma[j].trim();
-                }
-
-                for(int k = 1; k < inComma.length; k++){
-                    if(inQuotes.indexOf("{}") != -1){
-
-                        if(variables.containsKey(inComma[k])){
-                            inComma[k] = (variables.get(inComma[k]).getValue()).toString();
+            if(line.indexOf("'") != -1){
+                int first = line.indexOf("'");
+                int second = line.indexOf("'", first+1);
+                String inQuotes = line.substring(first+1, second);
+                
+                if(inQuotes.indexOf("{}") != -1){
+                    if(line.indexOf(",", second) == -1){
+                        System.out.println("Não foram encontradas variaveis para imprimir");
+                        System.exit(0);
+                    }
+                    String [] inComma = (line.substring(line.indexOf(",", second), line.length()-1)).split(",");
+                    for(int j = 1; j < inComma.length; j++){
+                        inComma[j] = inComma[j].trim();
+                    }
+    
+                    for(int k = 1; k < inComma.length; k++){
+                        if(inQuotes.indexOf("{}") != -1){
+    
+                            if(variables.containsKey(inComma[k])){
+                                inComma[k] = (variables.get(inComma[k]).getValue()).toString();
+                            }
+                            else{
+                                if(inComma[k].indexOf(".") != -1){
+                                    inQuotes = inQuotes.replaceFirst("\\{}", Operation.chooseOperation(inComma[k], "double", variables).toString());
+                                } 
+                                else {
+                                    inQuotes = inQuotes.replaceFirst("\\{}", Operation.chooseOperation(inComma[k], "int", variables).toString());
+                                }
+                            }
+                            inQuotes = inQuotes.replaceFirst("\\{}", inComma[k]);
                         }
                         else{
-                            if(inComma[k].indexOf(".") != -1){
-                                inQuotes = inQuotes.replaceFirst("\\{}", Operation.chooseOperation(inComma[k], "double", variables).toString());
-                            } 
-                            else {
-                                inQuotes = inQuotes.replaceFirst("\\{}", Operation.chooseOperation(inComma[k], "int", variables).toString());
-                            }
+                            System.out.println("Não foi possível imprimir");
+                            System.exit(0);
                         }
-                        inQuotes = inQuotes.replaceFirst("\\{}", inComma[k]);
                     }
-                    else{
-                        System.out.println("Não foi possível imprimir");
-                        System.exit(0);
+                }
+                inQuotes = inQuotes.replace("\\n", "\n");
+                System.out.printf(inQuotes);
+            }
+            else{
+                int first = line.indexOf("(");
+                int second = line.indexOf(")", first+1);
+                String expression = line.substring(first+1, second);
+                if(variables.containsKey(expression)){
+                    System.out.printf(variables.get(expression).getValue().toString());
+                }
+                else{
+                    if(expression.indexOf(".") != -1){
+                        System.out.printf(Operation.chooseOperation(expression, "double", variables).toString());
+                    } 
+                    else {
+                        System.out.printf(Operation.chooseOperation(expression, "int", variables).toString());
                     }
                 }
             }
-            inQuotes = inQuotes.replace("\\n", "\n");
-            System.out.printf(inQuotes);
         } 
+        if(withLn){
+            System.out.println();
+        }
     }
 
-    //TODO: juntar tudo as função pia
     private void intTreatment(String line){
         VarInt integer;
         String concatLine = "";
@@ -233,6 +264,7 @@ public class Parser {
     }
 
     private int ifTreatment(String[] lines, int posLine){
+        Parser newParser = new Parser(variables);
         int countIf = 1;
         int firstParenth = lines[posLine].indexOf("(");
         int lastParenth = lines[posLine].lastIndexOf(")");
@@ -262,13 +294,16 @@ public class Parser {
                 countIf++;
             }
         }
-        if(Condition.isTrue(condition, variables)){
+        if(Condition.isTrue(condition, newParser.variables)){
             parseInsideIf = Util.removeArray(parseInsideIf.length, parseInsideIf, parseInsideIf.length-1);
-            parseLines(parseInsideIf);
+            newParser.parseLines(parseInsideIf);
         }
         else{
             parseInsideElse = Util.removeArray(parseInsideElse.length, parseInsideElse, parseInsideElse.length-1);
-            parseLines(parseInsideElse);
+            newParser.parseLines(parseInsideElse);
+        }
+        for (String key : variables.keySet()) {
+            variables.get(key).setValue(newParser.variables.get(key).getValue());
         }
         if(posLine+1 > lines.length){
             return posLine;
@@ -277,6 +312,7 @@ public class Parser {
     }
 
     private int forTreatment(String[] lines, int posLine){
+        Parser newParser = new Parser(variables);
         int countFor = 1;
         int firstParenth = lines[posLine].indexOf("(");
         int lastParenth = lines[posLine].lastIndexOf(")");
@@ -297,25 +333,23 @@ public class Parser {
         parseInsideFor = Util.removeArray(parseInsideFor.length, parseInsideFor, parseInsideFor.length-1);
 
         if(forController[0].indexOf("int") != -1){
-            intTreatment(forController[0]);
+            newParser.intTreatment(forController[0]);
         }
         else if(forController[0].indexOf("=") != -1){
-            variableTreatment(forController[0]);
+            newParser.variableTreatment(forController[0]);
         }
         else if(!variables.containsKey(forController[0].trim())){
             System.out.println("Variavel não encontrada!");
             System.exit(0);
         }
 
-        while(Condition.isTrue(forController[1], variables)){
-            parseLines(parseInsideFor);
-            variableTreatment(forController[2]);
+        while(Condition.isTrue(forController[1], newParser.variables)){
+            newParser.parseLines(parseInsideFor);
+            newParser.variableTreatment(forController[2]);
         }
-        if(forController[0].indexOf("int") != -1){
-            String [] firstInstance = Util.lineInWordArray(forController[0].substring(0, forController[0].indexOf("=")));
-            variables.remove(firstInstance[1]);
+        for (String key : variables.keySet()) {
+            variables.get(key).setValue(newParser.variables.get(key).getValue());
         }
-        
         if(posLine+1 > lines.length){
             return posLine;
         }
@@ -323,6 +357,7 @@ public class Parser {
     }
 
     private int whileTreatment(String[] lines, int posLine){
+        Parser newParser = new Parser(variables);
         int countWhile = 1;
         int firstParenth = lines[posLine].indexOf("(");
         int lastParenth = lines[posLine].lastIndexOf(")");
@@ -342,8 +377,12 @@ public class Parser {
         }
         parseInsideWhile = Util.removeArray(parseInsideWhile.length, parseInsideWhile, parseInsideWhile.length-1);
 
-        while(Condition.isTrue(condition, variables)){
-            parseLines(parseInsideWhile);
+        while(Condition.isTrue(condition, newParser.variables)){
+            newParser.parseLines(parseInsideWhile);
+        }
+
+        for (String key : variables.keySet()) {
+            variables.get(key).setValue(newParser.variables.get(key).getValue());
         }
         
         if(posLine+1 > lines.length){
