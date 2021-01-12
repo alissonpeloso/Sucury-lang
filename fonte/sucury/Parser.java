@@ -14,11 +14,6 @@ public class Parser {
         oi[0] = "int a = 5";
         oi[1] = "a --";
         
-        Parser alo = new Parser();
-        alo.parseLines(oi);
-        alo.printVariables();
-
-        System.out.println(Operation.chooseOperation("a", "int", alo.variables));
     }
 
     Parser(){
@@ -32,55 +27,62 @@ public class Parser {
     }
 
     public void parseLines(String[] lines){
-        for (int i = 0; i < lines.length ; i++) {
-
-            //------Verifica se é print-----//
-            if(Pattern.compile("^\\s*print[\\s]*[(]").matcher(lines[i]).find()){
-                printTreatment(lines[i],false);
+        try {
+            for (int i = 0; i < lines.length ; i++) {
+                //------Verifica se é print-----//
+                if(Pattern.compile("^\\s*print[\\s]*[(]").matcher(lines[i]).find()){
+                    printTreatment(lines[i],false);
+                }
+                //------Verifica se é println-----//
+                else if(Pattern.compile("^\\s*println[\\s]*[(]").matcher(lines[i]).find()){
+                    printTreatment(lines[i],true);
+                }
+                //------Verifica se é int-----//
+                else if(Pattern.compile("^\\s*int\\s").matcher(lines[i]).find()){
+                    intTreatment(lines[i]);
+                } 
+                //------Verifica se é float-----//
+                else if(Pattern.compile("^\\s*float\\s").matcher(lines[i]).find()){
+                    floatTreatment(lines[i]);
+                } 
+                //------Verifica se é double-----//
+                else if(Pattern.compile("^\\s*double\\s").matcher(lines[i]).find()){
+                    doubleTreatment(lines[i]);
+                }
+                //------Verifica se é string-----//
+                else if(Pattern.compile("^\\s*string\\s").matcher(lines[i]).find()){
+                    stringTreatment(lines[i]);
+                }
+                //------Verifica se é scan-----//
+                else if(Pattern.compile("^\\s*scan[\\s]*[(]").matcher(lines[i]).find()){
+                    scanTreatment(lines[i]);
+                }
+                //------Verifica se é if-----//
+                else if(Pattern.compile("^\\s*if[\\s]*[(]").matcher(lines[i]).find()){
+                    i = ifTreatment(lines, i);
+                }
+                //------Verifica se é for-----//
+                else if(Pattern.compile("^\\s*for[\\s]*[(]").matcher(lines[i]).find()){
+                    i = forTreatment(lines, i);
+                }
+                //------Verifica se é while-----//
+                else if(Pattern.compile("^\\s*while[\\s]*[(]").matcher(lines[i]).find()){
+                    i = whileTreatment(lines, i);
+                }
+                else if(!Pattern.compile("^\\s*$").matcher(lines[i]).find()){
+                    variableTreatment(lines[i]);
+                }
+                currentLine++;
             }
-            //------Verifica se é println-----//
-            else if(Pattern.compile("^\\s*println[\\s]*[(]").matcher(lines[i]).find()){
-                printTreatment(lines[i],true);
-            }
-            //------Verifica se é int-----//
-            else if(Pattern.compile("^\\s*int\\s").matcher(lines[i]).find()){
-                intTreatment(lines[i]);
-            } 
-            //------Verifica se é float-----//
-            else if(Pattern.compile("^\\s*float\\s").matcher(lines[i]).find()){
-                floatTreatment(lines[i]);
-            } 
-            //------Verifica se é double-----//
-            else if(Pattern.compile("^\\s*double\\s").matcher(lines[i]).find()){
-                doubleTreatment(lines[i]);
-            }
-            //------Verifica se é string-----//
-            else if(Pattern.compile("^\\s*string\\s").matcher(lines[i]).find()){
-                stringTreatment(lines[i]);
-            }
-            //------Verifica se é scan-----//
-            else if(Pattern.compile("^\\s*scan[\\s]*[(]").matcher(lines[i]).find()){
-                scanTreatment(lines[i]);
-            }
-            //------Verifica se é if-----//
-            else if(Pattern.compile("^\\s*if[\\s]*[(]").matcher(lines[i]).find()){
-                i = ifTreatment(lines, i);
-            }
-            //------Verifica se é for-----//
-            else if(Pattern.compile("^\\s*for[\\s]*[(]").matcher(lines[i]).find()){
-                i = forTreatment(lines, i);
-            }
-            //------Verifica se é while-----//
-            else if(Pattern.compile("^\\s*while[\\s]*[(]").matcher(lines[i]).find()){
-                i = whileTreatment(lines, i);
-            }
-            else if(!Pattern.compile("^\\s*$").matcher(lines[i]).find()){
-                variableTreatment(lines[i]);
-            }
+        } catch (SucuryException e) {
+            e.printException(currentLine);
+            System.exit(1);
         }
     }
 
-    private void printTreatment(String line, boolean withLn){
+    private void printTreatment(String line, boolean withLn) throws SucuryException {
+        getParenthesisContent(line); // função chamada apenas para validar os parenteses
+                                    // ? da pra tirar esse if?
         if(line.indexOf("(") != -1 && line.indexOf(")") != -1 ){
             if(line.indexOf("'") != -1){
                 int first = line.indexOf("'");
@@ -89,8 +91,8 @@ public class Parser {
                 
                 if(inQuotes.indexOf("{}") != -1){
                     if(line.indexOf(",", second) == -1){
-                        System.out.println("Não foram encontradas variaveis para imprimir");
-                        System.exit(0);
+                        SucuryException exception = new SucuryException("Não foram encontradas variáveis para imprimir");
+                        throw exception;
                     }
                     String [] inComma = (line.substring(line.indexOf(",", second), line.length()-1)).split(",");
                     for(int j = 1; j < inComma.length; j++){
@@ -114,8 +116,8 @@ public class Parser {
                             inQuotes = inQuotes.replaceFirst("\\{}", inComma[k]);
                         }
                         else{
-                            System.out.println("Não foi possível imprimir");
-                            System.exit(0);
+                            SucuryException exception = new SucuryException("Não foi possível imprimir");
+                            throw exception;
                         }
                     }
                 }
@@ -144,11 +146,12 @@ public class Parser {
         }
     }
 
-    private void intTreatment(String line){
+    private void intTreatment(String line) throws SucuryException {
         VarInt integer;
         String concatLine = "";
         int equalPosition = line.indexOf("=");
         String [] preEquals =Util.lineInWordArray(line);
+        varNameValidate(preEquals[1]);
         
         if(equalPosition != -1){ //Verifica se tem sinal de =
             preEquals = Util.lineInWordArray(line.substring(0, equalPosition));
@@ -165,11 +168,12 @@ public class Parser {
         variables.put(integer.name, integer);
     }
 
-    private void floatTreatment(String line){
+    private void floatTreatment(String line) throws SucuryException {
         VarFloat pfloat;
         String concatLine = "";
         int equalPosition = line.indexOf("=");
         String [] preEquals =Util.lineInWordArray(line);
+        varNameValidate(preEquals[1]);
 
         if(equalPosition != -1){ //Verifica se tem sinal de =
             preEquals = Util.lineInWordArray(line.substring(0, equalPosition));
@@ -186,11 +190,13 @@ public class Parser {
         variables.put(pfloat.name, pfloat);
     }
 
-    private void doubleTreatment(String line){
+    private void doubleTreatment(String line) throws SucuryException {
         VarDouble pfloat;
         String concatLine = "";
         int equalPosition = line.indexOf("=");
         String [] preEquals =Util.lineInWordArray(line);
+        varNameValidate(preEquals[1]);
+
 
         if(equalPosition != -1){ //Verifica se tem sinal de =
             preEquals = Util.lineInWordArray(line.substring(0, equalPosition));
@@ -207,13 +213,15 @@ public class Parser {
         variables.put(pfloat.name, pfloat);
     }
     
-    private void stringTreatment(String line){
+    private void stringTreatment(String line) throws SucuryException {
         VarString integer;
         if(line.indexOf("=") != -1){
             
             String STRcomplete;
             String[] splitStr = line.split("=");
             String[] varName = Util.lineInWordArray(splitStr[0]);
+            varNameValidate(varName[1]);
+
             
             int first = line.indexOf("'");
             int second = line.lastIndexOf("'");
@@ -237,8 +245,9 @@ public class Parser {
         variables.put(integer.name, integer);
     }
 
-    private void scanTreatment(String line){
-        String variable = line.substring(line.indexOf("(")+1, line.indexOf(")"));
+    private void scanTreatment(String line) throws SucuryException {
+        // String variable = line.substring(line.indexOf("(")+1, line.indexOf(")"));
+        String variable = getParenthesisContent(line);
         if(variables.containsKey(variable)){
             Scanner scan = new Scanner(System.in);
             String lineScan = scan.nextLine();
@@ -258,17 +267,18 @@ public class Parser {
             }
         }
         else{
-            System.out.println("Variável não encontrada");
-            System.exit(0);
+            SucuryException exception = new SucuryException("Variável não encontrada");
+            throw exception;
         }
     }
 
-    private int ifTreatment(String[] lines, int posLine){
+    private int ifTreatment(String[] lines, int posLine) throws SucuryException {
         Parser newParser = new Parser(variables);
         int countIf = 1;
-        int firstParenth = lines[posLine].indexOf("(");
-        int lastParenth = lines[posLine].lastIndexOf(")");
-        String condition = lines[posLine].substring(firstParenth+1,lastParenth);
+        // int firstParenth = lines[posLine].indexOf("(");
+        // int lastParenth = lines[posLine].lastIndexOf(")");
+        // String condition = lines[posLine].substring(firstParenth+1,lastParenth);
+        String condition =  getParenthesisContent(lines[posLine]);
         String [] parseInsideIf = new String[0];
         String [] parseInsideElse = new String[0];
 
@@ -276,7 +286,10 @@ public class Parser {
 
         while(countIf > 0){
             posLine++;
-
+            if(posLine >= lines.length){
+                SucuryException exception = new SucuryException("Erro de sintaxe", "endif não encontrado");
+                throw exception;
+            }
             if(!findElse){
                 parseInsideIf = Util.appendArray(parseInsideIf.length, parseInsideIf, lines[posLine]);
             }
@@ -311,16 +324,22 @@ public class Parser {
         return posLine++;
     }
 
-    private int forTreatment(String[] lines, int posLine){
+    private int forTreatment(String[] lines, int posLine) throws SucuryException {
         Parser newParser = new Parser(variables);
         int countFor = 1;
-        int firstParenth = lines[posLine].indexOf("(");
-        int lastParenth = lines[posLine].lastIndexOf(")");
-        String [] forController = lines[posLine].substring(firstParenth+1,lastParenth).split(";");
+        // int firstParenth = lines[posLine].indexOf("(");
+        // int lastParenth = lines[posLine].lastIndexOf(")");
+        // String [] forController = lines[posLine].substring(firstParenth+1,lastParenth).split(";");
+        String [] forController =  getParenthesisContent(lines[posLine]).split(";");
+        forParametersValidate(forController, lines[posLine]);
 
         String [] parseInsideFor = new String[0];
         while(countFor > 0){
             posLine++;
+            if(posLine >= lines.length){
+                SucuryException exception = new SucuryException("Erro de sintaxe", "endfor não encontrado");
+                throw exception;
+            }
             parseInsideFor = Util.appendArray(parseInsideFor.length, parseInsideFor, lines[posLine]);
             
             if(lines[posLine].indexOf("endfor") != -1){
@@ -339,8 +358,8 @@ public class Parser {
             newParser.variableTreatment(forController[0]);
         }
         else if(!variables.containsKey(forController[0].trim())){
-            System.out.println("Variavel não encontrada!");
-            System.exit(0);
+            SucuryException exception = new SucuryException("Variável não encontrada");
+            throw exception;
         }
 
         while(Condition.isTrue(forController[1], newParser.variables)){
@@ -356,16 +375,18 @@ public class Parser {
         return posLine++;
     }
 
-    private int whileTreatment(String[] lines, int posLine){
+    private int whileTreatment(String[] lines, int posLine) throws SucuryException {
         Parser newParser = new Parser(variables);
         int countWhile = 1;
-        int firstParenth = lines[posLine].indexOf("(");
-        int lastParenth = lines[posLine].lastIndexOf(")");
-        String condition = lines[posLine].substring(firstParenth+1,lastParenth);
+        String condition =  getParenthesisContent(lines[posLine]);
 
         String [] parseInsideWhile = new String[0];
         while(countWhile > 0){
             posLine++;
+            if(posLine >= lines.length){
+                SucuryException exception = new SucuryException("Erro de sintaxe", "endwhile não encontrado");
+                throw exception;
+            }
             parseInsideWhile = Util.appendArray(parseInsideWhile.length, parseInsideWhile, lines[posLine]);
             
             if(lines[posLine].indexOf("endwhile") != -1){
@@ -391,7 +412,7 @@ public class Parser {
         return posLine++;
     }
 
-    private void variableTreatment(String line){
+    private void variableTreatment(String line) throws SucuryException {
         String concatLine = "";
         String [] preOperator = new String[0];
         String[] posOperator = new String[0];
@@ -493,5 +514,45 @@ public class Parser {
             System.out.println("Nome: "+key+" | Valor: "+variable.getValue()+" | Tipo: "+variable.type);
         }
     }
-}
 
+    private String getParenthesisContent(String line) throws SucuryException {
+        int firstParenth = line.indexOf("(");
+        int lastParenth = line.lastIndexOf(")");
+
+        if (firstParenth == -1 || lastParenth == -1) {
+            SucuryException exception = new SucuryException("Erro de sintaxe", line.trim() ,"Número incorreto de parênteses");
+            throw exception;
+        }
+
+        String betweenParenthesis = line.substring(firstParenth+1,lastParenth);
+        return betweenParenthesis.replaceAll("\\s+", " ").trim();
+    }
+
+    private void varNameValidate(String varName) throws SucuryException {
+        if(Pattern.compile("^for$|^while$|^if$|^endfor$|^endwhile$|^endif$|^print$|^println$|^scan$|^int$|^float$|^string$|^double$").matcher(varName).find()){
+            SucuryException exception = new SucuryException("Não é possível declarar uma variável com o nome", varName, "O nome inserido é uma palavra reservada");
+            throw exception;
+        } 
+        if(Pattern.compile("[^a-zA-Z0-9_]").matcher(varName).find()){
+            SucuryException exception = new SucuryException("Não é possível declarar uma variável com o nome", varName, "O nome inserido possui caracteres inválidos");
+            throw exception;
+        } 
+        if(Pattern.compile("^[0-9]").matcher(varName).find()){
+            SucuryException exception = new SucuryException("Não é possível declarar uma variável com o nome", varName, "Nomes de variáveis não podem iniciar com números");
+            throw exception;
+        }
+    }
+
+    private void forParametersValidate(String [] forController, String forLine) throws SucuryException {
+        if(forController.length != 3) {
+            SucuryException exception = new SucuryException("Erro de sintaxe", forLine ,"Número incorreto de parâmetros");
+            throw exception;
+        }
+        if(Pattern.compile("^\\s*$").matcher(forController[0]).find() ||
+           Pattern.compile("^\\s*$").matcher(forController[1]).find() ||
+           Pattern.compile("^\\s*$").matcher(forController[2]).find()) {
+            SucuryException exception = new SucuryException("Erro de sintaxe", forLine ,"Não são permitidos parâmetros vazios");
+            throw exception;
+        }        
+    }
+}

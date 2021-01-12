@@ -4,7 +4,7 @@ import java.util.regex.Pattern;
 
 public class Condition {
 
-    public static boolean isTrue(String condition, Map<String, Variable> variables){
+    public static boolean isTrue(String condition, Map<String, Variable> variables) throws SucuryException {
         condition = condition.trim(); //remove espaços do início e do fim
         if(condition.indexOf("&&") != -1){
             int andPosition = condition.indexOf("&&");
@@ -150,6 +150,10 @@ public class Condition {
             if(leftValue < rightValue){
                 result = true;
             }
+        }
+        else {
+            SucuryException exception = new SucuryException("Não foi possível atribuir valor lógico à condição", condition);
+            throw exception;
         }
         if(isDenied){
             return !result;

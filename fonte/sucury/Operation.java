@@ -35,7 +35,7 @@ public class Operation {
         return newContent;
     }
 
-    public static Object chooseOperation(String content, String type, Map<String, Variable> variables){
+    public static Object chooseOperation(String content, String type, Map<String, Variable> variables) throws SucuryException {
         String [] values = treatment(content);
         Object result = new Object();
         
@@ -208,6 +208,7 @@ public class Operation {
         }
         return 0;
     }
+    
     public static String concatString(String inQuotes){
         String concatenada="";
         String splitQuotes[] = inQuotes.split("'");
@@ -217,6 +218,7 @@ public class Operation {
         }
         return concatenada;
     }
+    
     public static String concatAfterDeclaration(String line){
         String STRcomplete;
         int first = line.indexOf("'");
@@ -233,12 +235,13 @@ public class Operation {
             return splitQuotes[1];
         }
     }
-    private static String variableReplacement(String operand, Map<String, Variable> variables){
+    
+    private static String variableReplacement(String operand, Map<String, Variable> variables) throws SucuryException {
         if (variables.containsKey(operand)){
             return variables.get(operand).getValue().toString();
         } else if(!Pattern.compile("^[\\-]{0,1}[0-9]*[.]{0,1}[0-9]+$").matcher(operand).find()){
-            System.out.println("Variável não encontrada "+operand);
-            System.exit(0);
+            SucuryException exception = new SucuryException("Variável não encontrada", operand);
+            throw exception;
         }
         return operand;
     }
