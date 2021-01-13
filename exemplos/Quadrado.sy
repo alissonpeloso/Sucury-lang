@@ -1,0 +1,9 @@
+int size
+print('Insira o tamanho do quadrado (int): ')
+scan(size)
+for(int i = 0; i < size; i++)
+    for(int j = 0; j < size; j++)
+        print('# ')
+    endfor
+    print('\n')
+endfor
