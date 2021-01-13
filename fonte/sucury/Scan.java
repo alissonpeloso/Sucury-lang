@@ -3,8 +3,7 @@ import java.io.File;
 import java.util.Scanner;
 
 public class Scan {
-    String lines[];
-    int numbLines;
+    protected String lines[];
 
     public void printFile(){
         for (int i = 0; i < this.lines.length ; i++) {
@@ -26,5 +25,5 @@ public class Scan {
             System.out.println("Nao foi possivel abrir o arquivo "+fileName+".");
             e.printStackTrace();
         }
-    }    
+    }
 }

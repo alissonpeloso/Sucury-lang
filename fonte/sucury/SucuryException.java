@@ -21,12 +21,14 @@ public class SucuryException extends Exception {
     } 
 
     public void printException(int line){
-        System.out.println("\nLinha: "+line);
+        System.out.println("\n--------------------------------------------------");
+        System.out.println("Linha: "+line);
         System.out.print("Erro: "+this.message);
         if(this.cause != null)
             System.out.print(": "+this.cause);
         System.out.println();
         if(this.description != null)
-            System.out.println("Descrição: "+this.description+"");
+            System.out.println("Descrição: "+this.description);
+        System.out.println("--------------------------------------------------");
     }
 }
