@@ -1,0 +1,9 @@
+double a
+print('Digite um número: ')
+scan(a)
+println()
+double b
+scan(b)
+
+double media = (a+b)/2
+println('a média de %f e %f é: %f', a,b,media)

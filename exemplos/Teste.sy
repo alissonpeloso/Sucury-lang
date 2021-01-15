@@ -1,6 +1,0 @@
-int numero = 5
-if(numero <= 5)
-    print('é menor ou igual a 5\n')
-else
-    print('não é menor ou igual a 5\n')
-endif
