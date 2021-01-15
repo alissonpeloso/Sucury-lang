@@ -1,0 +1,12 @@
+print('Insira a altura da escadinha (int): ')
+int a
+scan(a)
+
+for(int i = 0; i < a ; i++)
+    for(int j = 0; j < a; j++)
+        if(i >= j)
+            print('# ')
+        endif
+    endfor
+    println()
+endfor

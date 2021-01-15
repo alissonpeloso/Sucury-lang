@@ -1,0 +1,26 @@
+def int isPrime(int number)
+    int countDiv = 0
+    for(int i = 2; i < (number+1)/2 ; i++)
+        if(number % i == 0)
+            countDiv++
+        endif
+    endfor
+    if(countDiv > 0 || number <= 1)
+        return 0
+    endif
+    return 1
+enddef
+
+
+int a
+print('Digite um número: ')
+scan(a)
+int thisNumberIsPrime = isPrime(a)
+
+if(thisNumberIsPrime == 1)
+    println('O número %i é primo',a)
+else
+    println('O número %i não é primo',a)
+endif
+
+

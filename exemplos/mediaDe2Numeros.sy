@@ -1,7 +1,7 @@
 double a
 print('Digite um número: ')
 scan(a)
-println()
+print('Digite um número: ')
 double b
 scan(b)
 
