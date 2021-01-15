@@ -104,8 +104,10 @@ public class Parser {
     }
 
     private void printTreatment(String line, boolean withLn) throws SucuryException {
-        getParenthesisContent(line); // função chamada apenas para validar os parenteses
-        if(line.indexOf("'") != -1 && !Pattern.compile("'*\\s*[\\+]\\s*'*").matcher(line).find()){
+        if(Pattern.compile("^\\s*println[\\s]*[(]+[])]").matcher(line).find() || Pattern.compile("^\\s*print[\\s]*[(]+[])]").matcher(line).find()){
+            System.out.printf("");
+        }
+        else if(line.indexOf("'") != -1 && !Pattern.compile("'*\\s*[\\+]\\s*'*").matcher(line).find()){
             int first = line.indexOf("'");
             int second = line.indexOf("'", first+1);
             String inQuotes = line.substring(first+1, second);
@@ -169,7 +171,12 @@ public class Parser {
 
             for(int i = 0; i < variableVerification.length; i++){
                 if(variables.containsKey(variableVerification[i])){
-                    variableVerification[i] = variables.get(variableVerification[i]).getValue().toString();
+                    if(variables.get(variableVerification[i]).type.equals("string")){
+                        variableVerification[i] = "'"+variables.get(variableVerification[i]).getValue().toString()+"'";
+                    }
+                    else{
+                        variableVerification[i] = variables.get(variableVerification[i]).getValue().toString();
+                    }
                 }
                 if(isInt(variableVerification[i])){
                     haveInt = true;
@@ -294,20 +301,20 @@ public class Parser {
         if(variables.containsKey(variable)){
             Scanner scan = new Scanner(System.in);
             String lineScan = scan.nextLine();
-            scan.close();
 
             if (variables.get(variable).type.equals("int")) {
-                variables.get(variable).setValue(Integer.parseInt(lineScan));
+                variables.get(variable).setValue(scan.nextInt());
             }
             else if (variables.get(variable).type.equals("float")) {
-                variables.get(variable).setValue(Float.parseFloat(lineScan));
+                variables.get(variable).setValue(scan.nextDouble());
             }
             else if (variables.get(variable).type.equals("double")) {
-                variables.get(variable).setValue(Double.parseDouble(lineScan));
+                variables.get(variable).setValue(scan.nextDouble());
             }
             else {
                 variables.get(variable).setValue(lineScan);
             }
+            scan.close();
         }
         else{
             SucuryException exception = new SucuryException("Variável não encontrada");
@@ -749,7 +756,7 @@ public class Parser {
     }
 
     private boolean isString(String expression){
-        if(!isInt(expression) && !isFloat(expression)){
+        if(!isInt(expression) && !isFloat(expression) && expression.indexOf("'") != -1){
             return true;
         }
         return false;
