@@ -1,4 +1,12 @@
 package fonte.sucury;
+
+// Analisa as linhas escaneadas e chama os métodos necessários
+
+// Alisson Peloso     <alisson.luan2000@gmail.com>
+// Eduardo Lazaretti  <eduardolazaretti3@gmail.com>
+// Guilherme Graeff   <guilherme.rafael.graeff@gmail.com>
+// Stefani Meneghetti <meneghettistefani@gmail.com> 
+
 import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -6,6 +14,7 @@ import java.util.regex.Pattern;
 import java.util.LinkedHashMap;
 
 public class Parser {
+    public static boolean findReturn;
     public static int currentLine;
     protected Map<String, Variable> variables;
     protected Map<String, Function> functions;
@@ -15,6 +24,8 @@ public class Parser {
         this.variables = new LinkedHashMap<>();
         this.functions = new LinkedHashMap<>();
         currentLine = 1;
+        this.returnType = "void";
+        this.findReturn = false;
     }
 
     Parser(Map<String, Variable> variables, Map<String, Function> functions){
@@ -22,6 +33,9 @@ public class Parser {
         this.functions = new LinkedHashMap<>();
         this.variables.putAll(variables);
         this.functions.putAll(functions);
+        this.returnType = "void";
+        this.findReturn = false;
+
     }
 
     Parser(Map<String, Variable> variables, Map<String, Function> functions, String returnType){
@@ -30,6 +44,8 @@ public class Parser {
         this.variables.putAll(variables);
         this.functions.putAll(functions);
         this.returnType = returnType;
+        this.findReturn = false;
+
     }
 
     public static void main(String[] args) {
@@ -43,6 +59,10 @@ public class Parser {
     public void parseLines(String[] lines){
         try {
             for (int i = 0; i < lines.length ; i++) {
+                if(findReturn){
+                    break;
+                }
+
                 lines[i] = verifyFunction(lines[i]);
 
                 //------Verifica se é print-----//
@@ -90,7 +110,7 @@ public class Parser {
                 }
                 else if(Pattern.compile("^\\s*return\\s*").matcher(lines[i]).find()){
                     returnTreatment(lines[i]);
-                    break;
+                    findReturn = true;
                 }
                 else if(!Pattern.compile("^\\s*$").matcher(lines[i]).find()){
                     variableTreatment(lines[i]);
@@ -195,7 +215,7 @@ public class Parser {
             else if(!haveString && haveFloat){
                 result = Operation.chooseOperation(expression, "double", variables).toString();
             }
-            else if(haveString && !haveFloat && !haveInt){
+            else if(haveString){
                 result = Operation.chooseOperation(expression, "string", variables).toString();
             }
             else{
@@ -303,18 +323,17 @@ public class Parser {
             String lineScan = scan.nextLine();
 
             if (variables.get(variable).type.equals("int")) {
-                variables.get(variable).setValue(scan.nextInt());
+                variables.get(variable).setValue(Integer.parseInt(lineScan));
             }
             else if (variables.get(variable).type.equals("float")) {
-                variables.get(variable).setValue(scan.nextDouble());
+                variables.get(variable).setValue(Float.parseFloat(lineScan));
             }
             else if (variables.get(variable).type.equals("double")) {
-                variables.get(variable).setValue(scan.nextDouble());
+                variables.get(variable).setValue(Double.parseDouble(lineScan));
             }
             else {
                 variables.get(variable).setValue(lineScan);
             }
-            scan.close();
         }
         else{
             SucuryException exception = new SucuryException("Variável não encontrada");
@@ -323,7 +342,7 @@ public class Parser {
     }
 
     private int ifTreatment(String[] lines, int posLine) throws SucuryException {
-        Parser newParser = new Parser(variables, functions);
+        Parser newParser = new Parser(variables, functions, returnType);
         int countIf = 1;
         String condition =  getParenthesisContent(lines[posLine]);
         String [] parseInsideIf = new String[0];
@@ -355,29 +374,30 @@ public class Parser {
             }
         }
         currentLine++;
+
         if(Condition.isTrue(condition, newParser.variables)){
-            parseInsideIf = Util.removeArray(parseInsideIf.length, parseInsideIf, parseInsideIf.length-1);
-            newParser.parseLines(parseInsideIf);
+            newParser.parseLines(Util.removeArray(parseInsideIf.length, parseInsideIf, parseInsideIf.length-1));
             currentLine += parseInsideElse.length;
         }
+        
         else{
             currentLine += parseInsideIf.length;
-            parseInsideElse = Util.removeArray(parseInsideElse.length, parseInsideElse, parseInsideElse.length-1);
-            newParser.parseLines(parseInsideElse);
+            newParser.parseLines(Util.removeArray(parseInsideElse.length, parseInsideElse, parseInsideElse.length-1));
+            if(parseInsideElse.length == 0){
+                currentLine--;
+            }
         }
 
         for (String key : variables.keySet()) {
             variables.get(key).setValue(newParser.variables.get(key).getValue());
         }
-        if(posLine+1 > lines.length){
-            return posLine;
-        }
-        return posLine++;
+        
+        return posLine;
     }
 
     private int forTreatment(String[] lines, int posLine) throws SucuryException {
         int forInitialLine = currentLine+1;
-        Parser newParser = new Parser(variables, functions);
+        Parser newParser = new Parser(variables, functions, returnType);
         int countFor = 1;
         String [] forController =  getParenthesisContent(lines[posLine]).split(";");
         forParametersValidate(forController, lines[posLine]);
@@ -418,7 +438,7 @@ public class Parser {
         for (String key : variables.keySet()) {
             variables.get(key).setValue(newParser.variables.get(key).getValue());
         }
-        if(posLine+1 > lines.length){
+        if(posLine+1 >= lines.length){
             return posLine;
         }
         return posLine++;
@@ -426,7 +446,7 @@ public class Parser {
 
     private int whileTreatment(String[] lines, int posLine) throws SucuryException {
         int whileInitialLine = currentLine+1;
-        Parser newParser = new Parser(variables, functions);
+        Parser newParser = new Parser(variables, functions, returnType);
         int countWhile = 1;
         String condition =  getParenthesisContent(lines[posLine]);
 
@@ -612,7 +632,7 @@ public class Parser {
     }
 
     private void varNameValidate(String varName) throws SucuryException {
-        if(Pattern.compile("^for$|^while$|^if$|^endfor$|^endwhile$|^endif$|^print$|^println$|^scan$|^int$|^float$|^string$|^double$").matcher(varName).find()){
+        if(Pattern.compile("^for$|^while$|^if$|^endfor$|^endwhile$|^endif$|^print$|^println$|^scan$|^int$|^float$|^string$|^double$|^return$|^def$|^enddef$").matcher(varName).find()){
             SucuryException exception = new SucuryException("Não é possível declarar uma variável com o nome", varName, "O nome inserido é uma palavra reservada");
             throw exception;
         } 
@@ -639,7 +659,6 @@ public class Parser {
         }        
     }
 
-    // TODO: Ajustar situação em que não tem parametros na função;
     private int defTreatment(String [] lines, int position) throws SucuryException{
         String[] parameters = getParenthesisContent(lines[position]).split(",");
         String[] functionDef = Util.lineInWordArray(lines[position].substring(0,lines[position].indexOf("(")));
@@ -707,24 +726,26 @@ public class Parser {
             Matcher getFunction = Pattern.compile(regex).matcher(line);                          
 
             while(getFunction.find()){
-                String entireParameters = getFunctionParameters(line.substring(getFunction.end()-1));
-                String [] functionParameters = entireParameters.split(",");
-                String functionSummon = getFunction.group() + entireParameters + ")";
-                if(Pattern.compile("^[^a-zA-Z_]").matcher(functionSummon).find()){
-                    functionSummon = functionSummon.substring(1);
-                }                
+                String completeParameters = getFunctionParameters(line.substring(getFunction.end()-1));
+                String [] functionParameters = completeParameters.split(",");
                 Function function = functions.get(key);
-                int i = 0;
-
-                if(functionParameters.length != function.parameters.size()){
-                    SucuryException exception = new SucuryException("Erro de sintaxe", line ,"Número incorreto de parâmetros");
-                    throw exception;
-                }
-
-                for(String parameterName : function.parameters.keySet()){
-                    functionParameters[i] = functionParameters[i].replaceAll("\\s+", "");
-                    function.parameters.get(parameterName).setValue(Operation.chooseOperation(functionParameters[i], function.parameters.get(parameterName).type, variables));
-                    i++;
+                String functionSummon = getFunction.group() + completeParameters + ")";
+                if(!Pattern.compile("^\\s*$").matcher(completeParameters).find()){
+                    if(Pattern.compile("^[^a-zA-Z_]").matcher(functionSummon).find()){
+                        functionSummon = functionSummon.substring(1);
+                    }                
+                    int i = 0;
+    
+                    if(functionParameters.length != function.parameters.size()){
+                        SucuryException exception = new SucuryException("Erro de sintaxe", line ,"Número incorreto de parâmetros");
+                        throw exception;
+                    }
+    
+                    for(String parameterName : function.parameters.keySet()){
+                        functionParameters[i] = functionParameters[i].replaceAll("\\s+", "");
+                        function.parameters.get(parameterName).setValue(Operation.chooseOperation(functionParameters[i], function.parameters.get(parameterName).type, variables));
+                        i++;
+                    }
                 }
                 function.runFuncion(functions);
 
@@ -737,6 +758,7 @@ public class Parser {
                 }
                 getFunction = Pattern.compile(regex).matcher(line);
             }
+
         }
         return line;
     }

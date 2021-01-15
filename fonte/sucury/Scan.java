@@ -1,4 +1,12 @@
 package fonte.sucury;
+
+// Realiza a leitura das linhas do arquivo .sy
+
+// Alisson Peloso     <alisson.luan2000@gmail.com>
+// Eduardo Lazaretti  <eduardolazaretti3@gmail.com>
+// Guilherme Graeff   <guilherme.rafael.graeff@gmail.com>
+// Stefani Meneghetti <meneghettistefani@gmail.com> 
+
 import java.io.File;
 import java.util.Scanner;
 
@@ -22,8 +30,7 @@ public class Scan {
             }
             input.close();
         } catch (Exception e) {
-            System.out.println("Nao foi possivel abrir o arquivo "+fileName+".");
-            e.printStackTrace();
+            System.out.println("Não foi possivel abrir o arquivo "+fileName+".");
         }
     }
 }

@@ -1,6 +1,11 @@
-/* Adicionar bloco de comentário aqui */
-
 package fonte.sucury;
+
+// Main do programa, realiza as chamadas iniciais
+
+// Alisson Peloso     <alisson.luan2000@gmail.com>
+// Eduardo Lazaretti  <eduardolazaretti3@gmail.com>
+// Guilherme Graeff   <guilherme.rafael.graeff@gmail.com>
+// Stefani Meneghetti <meneghettistefani@gmail.com> 
 
 public class Sucury {
     public static void main(String[] args) {
@@ -10,9 +15,9 @@ public class Sucury {
         }
 
         String fileName = args[0];
-        Scan Teste = new Scan();
+        Scan scanner = new Scan();
         Parser parser = new Parser();
-        Teste.readFile(fileName);
-        parser.parseLines(Teste.lines);
+        scanner.readFile(fileName);
+        parser.parseLines(scanner.lines);
     }
 }

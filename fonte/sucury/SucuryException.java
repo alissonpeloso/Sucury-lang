@@ -1,5 +1,12 @@
 package fonte.sucury;
 
+// Classe com tratamento de erros
+
+// Alisson Peloso     <alisson.luan2000@gmail.com>
+// Eduardo Lazaretti  <eduardolazaretti3@gmail.com>
+// Guilherme Graeff   <guilherme.rafael.graeff@gmail.com>
+// Stefani Meneghetti <meneghettistefani@gmail.com> 
+
 public class SucuryException extends Exception {
     private String message;
     private String cause;

@@ -1,4 +1,12 @@
 package fonte.sucury;
+
+// Retorna o valor booleano de uma expressão condicional
+
+// Alisson Peloso     <alisson.luan2000@gmail.com>
+// Eduardo Lazaretti  <eduardolazaretti3@gmail.com>
+// Guilherme Graeff   <guilherme.rafael.graeff@gmail.com>
+// Stefani Meneghetti <meneghettistefani@gmail.com> 
+
 import java.util.Map;
 import java.util.regex.Pattern;
 

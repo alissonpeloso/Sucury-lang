@@ -1,4 +1,12 @@
 package fonte.sucury;
+
+// Algumas funções gerais para serem utilizadas :)
+
+// Alisson Peloso     <alisson.luan2000@gmail.com>
+// Eduardo Lazaretti  <eduardolazaretti3@gmail.com>
+// Guilherme Graeff   <guilherme.rafael.graeff@gmail.com>
+// Stefani Meneghetti <meneghettistefani@gmail.com> 
+
 import java.util.*;
 
 public class Util {
