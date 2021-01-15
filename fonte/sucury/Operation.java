@@ -38,7 +38,10 @@ public class Operation {
     public static Object chooseOperation(String content, String type, Map<String, Variable> variables) throws SucuryException {
         String [] values = treatment(content);
         Object result = new Object();
-        
+
+        if(type.equals("string")){
+            return stringOperation(content, variables);
+        }
         if(content.indexOf("(") != -1){
             for(int i = values.length-1; i >= 0 ; i--){
                 if(values[i].equals("(")){
@@ -61,8 +64,8 @@ public class Operation {
         if(content.indexOf("+") != -1 || content.indexOf("-") != -1 || content.indexOf("*") != -1 || content.indexOf("/") != -1 || content.indexOf("%") != -1){
             for(int i = 0; i < values.length; i++){
                 if(values[i].equals("*")){
-                    values[i+1] = Operation.variableReplacement(values[i+1], variables);
-                    values[i-1] = Operation.variableReplacement(values[i-1],variables);
+                    values[i+1] = Operation.variableReplacement(values[i+1], variables, type);
+                    values[i-1] = Operation.variableReplacement(values[i-1],variables, type);
                     result = mult(values, type, i-1, i+1);
                     values[i-1] = result.toString();
                     values = Util.removeArray(values.length, values, i);
@@ -72,8 +75,8 @@ public class Operation {
             }
             for(int i = 0; i < values.length; i++){
                 if(values[i].equals("/")){
-                    values[i+1] = Operation.variableReplacement(values[i+1], variables);
-                    values[i-1] = Operation.variableReplacement(values[i-1],variables);
+                    values[i+1] = Operation.variableReplacement(values[i+1], variables, type);
+                    values[i-1] = Operation.variableReplacement(values[i-1],variables, type);
                     result = div(values, type, i-1, i+1);
                     values[i-1] = result.toString();
                     values = Util.removeArray(values.length, values, i);
@@ -83,8 +86,8 @@ public class Operation {
             }
             for(int i = 0; i < values.length; i++){
                 if(values[i].equals("%")){
-                    values[i+1] = Operation.variableReplacement(values[i+1], variables);
-                    values[i-1] = Operation.variableReplacement(values[i-1],variables);
+                    values[i+1] = Operation.variableReplacement(values[i+1], variables, type);
+                    values[i-1] = Operation.variableReplacement(values[i-1],variables, type);
                     result = mod(values, type, i-1, i+1);
                     values[i-1] = result.toString();
                     values = Util.removeArray(values.length, values, i);
@@ -94,8 +97,8 @@ public class Operation {
             }
             for(int i = 0; i < values.length; i++){
                 if(values[i].equals("+")){
-                    values[i+1] = Operation.variableReplacement(values[i+1], variables);
-                    values[i-1] = Operation.variableReplacement(values[i-1],variables);
+                    values[i+1] = Operation.variableReplacement(values[i+1], variables, type);
+                    values[i-1] = Operation.variableReplacement(values[i-1],variables, type);
                     result = sum(values, type, i-1, i+1);
                     values[i-1] = result.toString();
                     values = Util.removeArray(values.length, values, i);
@@ -106,8 +109,8 @@ public class Operation {
             }
             for(int i = 0; i < values.length; i++){
                 if(values[i].equals("-")){
-                    values[i+1] = Operation.variableReplacement(values[i+1], variables);
-                    values[i-1] = Operation.variableReplacement(values[i-1],variables);
+                    values[i+1] = Operation.variableReplacement(values[i+1], variables, type);
+                    values[i-1] = Operation.variableReplacement(values[i-1],variables, type);
                     result = sub(values, type, i-1, i+1);
                     values[i-1] = result.toString();
                     values = Util.removeArray(values.length, values, i);
@@ -116,7 +119,7 @@ public class Operation {
                 }
             }
         }
-        values[0] = Operation.variableReplacement(values[0], variables);
+        values[0] = Operation.variableReplacement(values[0], variables, type);
         if(type.equals("float")){
             result = Float.parseFloat(values[0]);
         }
@@ -129,7 +132,7 @@ public class Operation {
         return result;
     }
 
-    public static Object sum(String[] values, String type, int pos1, int pos2){
+    public static Object sum(String[] values, String type, int pos1, int pos2) throws SucuryException{
         if(type.equals("float")){
             float result = Float.parseFloat(values[pos1]) + Float.parseFloat(values[pos2]);
             return result;
@@ -137,6 +140,7 @@ public class Operation {
         if(type.equals("int")){
             int result = Integer.parseInt(values[pos1]) + Integer.parseInt(values[pos2]);
             return result;
+            
         }
         if(type.equals("double")){
             double result = Double.parseDouble(values[pos1]) + Double.parseDouble(values[pos2]);
@@ -209,40 +213,44 @@ public class Operation {
         return 0;
     }
     
-    public static String concatString(String inQuotes){
-        String concatenada="";
-        String splitQuotes[] = inQuotes.split("'");
-            for(int i=1;i<=splitQuotes.length-1;i+=2){
-                concatenada= concatenada.concat(splitQuotes[i]);
-                concatenada= concatenada.concat(" ");
-        }
-        return concatenada;
-    }
+    public static String stringOperation(String expression, Map<String, Variable> variables){
+        // expression = expression.substring(expression.indexOf("'"), expression.lastIndexOf("'")+1).trim();
+        expression = expression.trim();
     
-    public static String concatAfterDeclaration(String line){
-        String STRcomplete;
-        int first = line.indexOf("'");
-        int second = line.lastIndexOf("'");
-            
-        String inQuotes = line.substring(first, second+1);
-            
-        if(inQuotes.indexOf("+") != -1){
-            STRcomplete= Operation.concatString(inQuotes);   
-            return STRcomplete;
+        String result;
+        int plusPosition = expression.indexOf("+");
+        if(plusPosition != -1){
+            String firstOperation = expression.substring(0, plusPosition);
+            String secondOperation = expression.substring(plusPosition+1, expression.length());
+
+            result = stringOperation(firstOperation, variables) + stringOperation(secondOperation, variables);
+            return result;
         }
-        else{
-            String splitQuotes[] = inQuotes.split("'");    
-            return splitQuotes[1];
+        if (variables.containsKey(expression)){
+            return variables.get(expression).getValue().toString();
         }
+        return expression.replace("'", "");
     }
-    
-    private static String variableReplacement(String operand, Map<String, Variable> variables) throws SucuryException {
+
+    private static String variableReplacement(String operand, Map<String, Variable> variables, String type) throws SucuryException {
         if (variables.containsKey(operand)){
             return variables.get(operand).getValue().toString();
         } else if(!Pattern.compile("^[\\-]{0,1}[0-9]*[.]{0,1}[0-9]+$").matcher(operand).find()){
             SucuryException exception = new SucuryException("Variável não encontrada", operand);
             throw exception;
         }
+        // else if(type.equals("int")){
+        //     if(!Pattern.compile("^[\\-]{0,1}[0-9]+$").matcher(operand).find()){
+        //         SucuryException exception = new SucuryException("Valor incompatível com o tipo esperado", operand);
+        //         throw exception;
+        //     }
+        // }
+        // else if(type.equals("double") || type.equals("float")){
+        //     if(!Pattern.compile("^[\\-]{0,1}[0-9]+$").matcher(operand).find()){
+        //         SucuryException exception = new SucuryException("Valor incompatível com o tipo esperado", operand);
+        //         throw exception;
+        //     }
+        // }
         return operand;
     }
 }
