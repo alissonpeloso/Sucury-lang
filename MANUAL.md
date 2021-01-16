@@ -1,6 +1,6 @@
 # <img src="https://www.flaticon.com/svg/vstatic/svg/616/616487.svg?token=exp=1610760439~hmac=43fd3a629dd7087e31e4dd996bb45c61" height = 20></img> **Sucury-lang** 
 
-É um interpretador baseado em Java, desenvolvido na disciplina de Programação 1 da Universidade Federal da Fronteira Sul (UFFS).
+É um interpretador projetado em Java, desenvolvido na disciplina de Programação 1 da Universidade Federal da Fronteira Sul (UFFS).
 
 **Desenvolvida pelos Estudantes Alisson Peloso, Eduardo Lazaretti, Guilherme Graeff e Stefani Meneghetti.**
 
@@ -224,7 +224,7 @@ boi
 ## **Condições**
 Sucury também pode utilizar de operadores condicionais.
 
-Sendo eles: **igual** (**==**), **diferente** (**!=**), **menor ou igual** (**<=**), maior ou igual (**>=**), **menor que** (**<**) e **maior que** (**>**).
+Sendo eles: **igual** (**==**), **diferente** (**!=**), **menor ou igual** (**<=**), **maior ou igual** (**>=**), **menor que** (**<**) e **maior que** (**>**).
 
 Também podemos verificar mais de uma condição utilizando operadores lógicos **and &&** e **or ||**. Além disso, podemos negar (inverter) a condição utilizando o **not !**.
 
@@ -353,7 +353,7 @@ A Sucury permite utilizar pedaços de código em funções para facilitar e maxi
 Para definir uma função, utiliza-se o **def**.
 Logo após o def, temos o tipo do retorno da função **(int, float, double, string ou void)**, seguido do nome da função e seus parâmetros. Após inserir o corpo da função, utiliza-se o **enddef** para fechar a definição. Síntaxe:
 ```
-def type name(type param1, type param2)
+def tipo nome(tipo param1, tipo param2)
     (bloco)
 enddef
 ```
