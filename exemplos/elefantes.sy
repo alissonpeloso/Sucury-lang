@@ -1,7 +1,7 @@
 print('1 Elefante incomoda muita gente\n')
 int i 
 for(i = 2;i <= 5; i++)
-    print('{} Elefantes ', i)
+    print('%i Elefantes ', i)
     for(int j = 0; j < i; j++)
         print('incomodam ');
     endfor
