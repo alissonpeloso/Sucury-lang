@@ -1,4 +1,4 @@
-# **Sucury-lang**
+# <img src="https://www.flaticon.com/svg/vstatic/svg/616/616487.svg?token=exp=1610760439~hmac=43fd3a629dd7087e31e4dd996bb45c61" height = 20></img> **Sucury-lang** 
 
 É um interpretador baseado em Java, desenvolvido na disciplina de Programação 1 da Universidade Federal da Fronteira Sul (UFFS).
 
@@ -25,6 +25,12 @@ Sucury-lang é flexível em relação aos espaçamentos e identação.
    - [**while**:](#while)
    - [**for**:](#for)
 6. [**Controlador de Fluxo**](#controlador-de-fluxo)
+7. [**Funções**](#Funções)
+    - [**Definição**:](#Definição)
+    - [**Retorno**:](#Retorno)
+    - [**Chamada**:](#Chamada)
+
+
 ***
 ***
 
@@ -190,24 +196,25 @@ println(variável)
 ```
 - **OBS:** A variável precisa ser declarada anteriorimente
   
-Para imprimir mais de uma variável ou variáveis juntamente com um texto, utiliza-se **{}** na síntaxe:
+Para imprimir mais de uma variável ou variáveis juntamente com um texto, utiliza-se **%type** na síntaxe.<br>
+**%i** para int, **%f** para float e double e **%s** para string:
 
 ```
-print('{} {}', var1, var2)
-println('texto {} {} {}', var1, var2, var3)
+print('%i %f', varInt, varDouble)
+println('texto %i %s %f', varInt, varStr, varFloat)
 ```
 
 Exemplo de utilização:
 ```
 int idade = 5
-print('Oi! Eu tenho {} anos\n', idade)
-println(idade)
+print('Oi! Eu tenho %i anos\n', idade)
+println('Tenho '+idade+' anos')
 println('boi')
 ```
 Saída:
 ```
 Oi! Eu tenho 5 anos
-5
+Tenho 5 anos
 boi
 ```
 
@@ -336,4 +343,49 @@ endif
 Saída:
 ```
 é menor ou igual a 5
+```
+***
+***
+## **Funções**
+A Sucury permite utilizar pedaços de código em funções para facilitar e maximizar na organização do código.
+***
+### **Definição**:
+Para definir uma função, utiliza-se o **def**.
+Logo após o def, temos o tipo do retorno da função **(int, float, double, string ou void)**, seguido do nome da função e seus parâmetros. Após inserir o corpo da função, utiliza-se o **enddef** para fechar a definição. Síntaxe:
+```
+def type name(type param1, type param2)
+    (bloco)
+enddef
+```
+***
+### **Retorno**:
+A função pode ter 5 tipos de retorno **(int, float, double, string ou void)**. O retorno recebe o tipo definido no início da função e ele substituí a chamada da função pelo retorno quando utilizado. Exemplo:
+```
+def int sum(int numb1, int numb2)
+    return numb1 + numb2
+enddef
+```
+***
+### **Chamada**:
+Para chamar a função, utilizamos o nome da função junto aos parâmetros que serão utilizados na função. Síntaxe:
+```
+nomeDaFunc(param1, param2)
+```
+Exemplos:
+```
+def int sum(int numb1, int numb2)
+    return numb1 + numb2
+enddef
+
+int numb = sum(1,2)
+```
+ou
+```
+def int sum(int numb1, int numb2)
+    return numb1 + numb2
+enddef
+
+int a = 1
+int b = 2
+int numb = sum(a,b)
 ```
