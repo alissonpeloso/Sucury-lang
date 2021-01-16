@@ -10,7 +10,7 @@ package fonte.sucury;
 public class Sucury {
     public static void main(String[] args) {
         if ( args.length !=1 ) {
-            System.out.println("Rode: java Sucury nomeArquivo.sy");
+            System.out.println("Execute: java -jar sucury.jar caminhoDoArquivo.sy");
             return;
         }
 
