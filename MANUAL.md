@@ -224,7 +224,7 @@ boi
 ## **Condições**
 Sucury também pode utilizar de operadores condicionais.
 
-Sendo eles: **igual** (**==**), **diferente** (**!=**), **menor ou igual** (**<=**), maior ou igual (**>=**), **menor que** (**<**) e **maior que** (**>**).
+Sendo eles: **igual** (**==**), **diferente** (**!=**), **menor ou igual** (**<=**), **maior ou igual** (**>=**), **menor que** (**<**) e **maior que** (**>**).
 
 Também podemos verificar mais de uma condição utilizando operadores lógicos **and &&** e **or ||**. Além disso, podemos negar (inverter) a condição utilizando o **not !**.
 
