@@ -353,7 +353,7 @@ A Sucury permite utilizar pedaços de código em funções para facilitar e maxi
 Para definir uma função, utiliza-se o **def**.
 Logo após o def, temos o tipo do retorno da função **(int, float, double, string ou void)**, seguido do nome da função e seus parâmetros. Após inserir o corpo da função, utiliza-se o **enddef** para fechar a definição. Síntaxe:
 ```
-def type name(type param1, type param2)
+def tipo nome(tipo param1, tipo param2)
     (bloco)
 enddef
 ```
