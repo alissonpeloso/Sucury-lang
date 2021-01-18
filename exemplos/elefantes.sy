@@ -1,4 +1,4 @@
-print('1 Elefante incomoda muita gente\n')
+println('1 Elefante incomoda muita gente')
 int i 
 for(i = 2;i <= 5; i++)
     print('%i Elefantes ', i)

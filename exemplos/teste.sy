@@ -1,8 +1,2 @@
-for(int l = 0; l < 3; l++)
-    if(2 != 2)
-        println('passou por 2')
-    else
-        println()
-    endif
-    a = 2
-endfor
+int a = 1.0
+prinln('%i', a)
