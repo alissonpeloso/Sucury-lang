@@ -189,14 +189,8 @@ Síntaxe:
 print(texto)
 println(texto)
 ```
-ou
-```
-print(variável)
-println(variável)
-```
-- **OBS:** A variável precisa ser declarada anteriorimente
   
-Para imprimir mais de uma variável ou variáveis juntamente com um texto, utiliza-se **%type** na síntaxe.<br>
+Para imprimir variáveis ou variáveis juntamente com um texto, utiliza-se **%type** na síntaxe.<br>
 **%i** para int, **%f** para float e double e **%s** para string:
 
 ```
@@ -208,14 +202,12 @@ Exemplo de utilização:
 ```
 int idade = 5
 print('Oi! Eu tenho %i anos\n', idade)
-println('Tenho '+idade+' anos')
-println('boi')
+println('Tenho %i anos', idade)
 ```
 Saída:
 ```
 Oi! Eu tenho 5 anos
 Tenho 5 anos
-boi
 ```
 
 ***
