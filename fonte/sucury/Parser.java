@@ -48,14 +48,6 @@ public class Parser {
 
     }
 
-    public static void main(String[] args) {
-        String a = "'oi' + 'boi'";
-        Matcher b = Pattern.compile("'*\\s*[\\+]\\s*'*").matcher(a);
-        if(b.find()){
-            System.out.println(b.group());
-        }
-    }
-
     public void parseLines(String[] lines){
         try {
             for (int i = 0; i < lines.length ; i++) {
