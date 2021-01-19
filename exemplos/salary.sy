@@ -1,0 +1,14 @@
+print('insira o número do funcionário: (int) ')
+int number
+scan(number)
+
+print('Insira a quantidade de horas trabalhadas: (int) ')
+int hours
+scan(hours)
+
+print('Insira o valor por hora trabalhada: (float) ')
+float money
+scan(money)
+
+println('NUMBER = %i', number)
+println('SALARY = U$ %f', money*hours)
