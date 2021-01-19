@@ -119,9 +119,9 @@ public class Parser {
         if(Pattern.compile("^\\s*println[\\s]*[(]+[])]").matcher(line).find() || Pattern.compile("^\\s*print[\\s]*[(]+[])]").matcher(line).find()){
             System.out.printf("");
         }
-        else if(line.indexOf("'") != -1 && !Pattern.compile("'*\\s*[\\+]\\s*'*").matcher(line).find()){
+        else if(line.indexOf("'") != -1){
             int first = line.indexOf("'");
-            int second = line.indexOf("'", first+1);
+            int second = line.lastIndexOf("'");
             String inQuotes = line.substring(first+1, second);
             
             if(Pattern.compile("%[ifs]").matcher(inQuotes).find()){
@@ -161,61 +161,6 @@ public class Parser {
 
             System.out.printf(inQuotes);
         }
-        else{
-            String result = "";
-            int first = line.indexOf("(");
-            int second = line.indexOf(")", first+1);
-            String expression = line.substring(first+1, second);
-            expression = expression.replaceAll("\\s+[\\+]\\s+", "+").trim();
-            
-            String findVariables = expression;
-            findVariables = findVariables.replaceAll("\\+", " ");
-            findVariables = findVariables.replaceAll("\\-", " ");
-            findVariables = findVariables.replaceAll("\\/", " ");
-            findVariables = findVariables.replaceAll("\\*", " ");
-            findVariables = findVariables.replaceAll("\\(", " ");
-            findVariables = findVariables.replaceAll("\\)", " ");
-            String [] variableVerification = Util.lineInWordArray(findVariables);
-
-            boolean haveInt = false;
-            boolean haveFloat = false;
-            boolean haveString = false;
-
-            for(int i = 0; i < variableVerification.length; i++){
-                if(variables.containsKey(variableVerification[i])){
-                    if(variables.get(variableVerification[i]).type.equals("string")){
-                        variableVerification[i] = "'"+variables.get(variableVerification[i]).getValue().toString()+"'";
-                    }
-                    else{
-                        variableVerification[i] = variables.get(variableVerification[i]).getValue().toString();
-                    }
-                }
-                if(isInt(variableVerification[i])){
-                    haveInt = true;
-                }
-                else if(isFloat(variableVerification[i])){
-                    haveFloat = true;
-                }
-                else if(isString(variableVerification[i])){
-                    haveString = true;
-                }
-            }
-
-            if(haveInt && !haveString && !haveFloat){
-                result = Operation.chooseOperation(expression, "int", variables).toString();
-            }
-            else if(!haveString && haveFloat){
-                result = Operation.chooseOperation(expression, "double", variables).toString();
-            }
-            else if(haveString){
-                result = Operation.chooseOperation(expression, "string", variables).toString();
-            }
-            else{
-                SucuryException exception = new SucuryException("Não foi possível imprimir");
-                throw exception;
-            }
-            System.out.printf(result);
-        } 
         if(withLn){
             System.out.println();
         }
@@ -753,26 +698,5 @@ public class Parser {
 
         }
         return line;
-    }
-
-    private boolean isInt(String expression){
-        if(Pattern.compile("^[\\-]{0,1}[0-9]+$").matcher(expression).find()){
-            return true;
-        }
-        return false;
-    }
-
-    private boolean isFloat(String expression){
-        if(Pattern.compile("^[\\-]{0,1}[0-9]*[.]{0,1}[0-9]+$").matcher(expression).find()){
-            return true;
-        }
-        return false;
-    }
-
-    private boolean isString(String expression){
-        if(!isInt(expression) && !isFloat(expression) && expression.indexOf("'") != -1){
-            return true;
-        }
-        return false;
     }
 }
