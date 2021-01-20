@@ -1,2 +1,2 @@
-int a = 1.0
-prinln('%i', a)
+int a = 65
+println('%i', (a+7)*2)
