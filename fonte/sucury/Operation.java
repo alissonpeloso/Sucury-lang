@@ -17,7 +17,7 @@ public class Operation {
         String concat = "";
         
         for(int i = 0; i < aux.length; i++){
-            if(aux[i].equals("+") || aux[i].equals("-") || aux[i].equals("*") || aux[i].equals("/") || aux[i].equals("%") || aux[i].equals("(") || aux[i].equals(")")){
+            if(aux[i].equals("+") || aux[i].equals("-") || aux[i].equals("*") || aux[i].equals("/") || aux[i].equals("%") || aux[i].equals("(") || aux[i].equals(")") || aux[i].equals("^")){
                 if(!concat.equals("")){
                     newContent = Util.appendArray(newContent.length, newContent, concat);
                     concat = "";
@@ -69,7 +69,7 @@ public class Operation {
             }
         }
         
-        if(content.indexOf("+") != -1 || content.indexOf("-") != -1 || content.indexOf("*") != -1 || content.indexOf("/") != -1 || content.indexOf("%") != -1){
+        if(content.indexOf("+") != -1 || content.indexOf("-") != -1 || content.indexOf("*") != -1 || content.indexOf("/") != -1 || content.indexOf("%") != -1 || content.indexOf("^") != -1){
             for(int i = 0; i < values.length; i++){
                 if(values[i].equals("*")){
                     values[i+1] = Operation.variableReplacement(values[i+1], variables, type);
@@ -120,6 +120,17 @@ public class Operation {
                     values[i+1] = Operation.variableReplacement(values[i+1], variables, type);
                     values[i-1] = Operation.variableReplacement(values[i-1],variables, type);
                     result = sub(values, type, i-1, i+1);
+                    values[i-1] = result.toString();
+                    values = Util.removeArray(values.length, values, i);
+                    values = Util.removeArray(values.length, values, i);
+                    i--;
+                }
+            }
+            for(int i = 0; i < values.length; i++){
+                if(values[i].equals("^")){
+                    values[i+1] = Operation.variableReplacement(values[i+1], variables, type);
+                    values[i-1] = Operation.variableReplacement(values[i-1],variables, type);
+                    result = pow(values, type, i-1, i+1);
                     values[i-1] = result.toString();
                     values = Util.removeArray(values.length, values, i);
                     values = Util.removeArray(values.length, values, i);
@@ -221,6 +232,26 @@ public class Operation {
         return 0;
     }
     
+    public static Object pow(String[] values, String type, int pos1, int pos2){
+        double aux = 1;
+        for(int i = 0; i < Integer.parseInt(values[pos2]); i++){
+            aux = aux * Double.parseDouble(values[pos1]);
+        }
+        if(type.equals("float")){
+            float result = (float) aux;
+            return result;
+        }
+        if(type.equals("int")){
+            int result = (int) aux;
+            return result; 
+        }
+        if(type.equals("double")){
+            double result = aux;
+            return result;
+        }
+        return 0;
+    }
+
     public static String stringOperation(String expression, Map<String, Variable> variables) throws SucuryException{
         expression = expression.trim();
         String result = "";

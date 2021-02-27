@@ -1,2 +1,4 @@
-int a = 65
-println('%i', (a+7)*2)
+int a = 2
+
+int b = a^10
+println('%i', b)
